@@ -1,0 +1,22 @@
+import { Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Role } from "./role.entity";
+import { Permission } from "../../permissions/entities/permission.entity";
+
+@Entity('role_permissions')
+export class RolePermission {
+
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @PrimaryColumn({ name: 'role_id' })
+  roleId: number;
+
+  @PrimaryColumn({ name: 'permission_id' })
+  permissionId: number;
+
+  @ManyToOne(() => Role, role => role.rolePermissions, { onDelete: 'CASCADE' })
+  role: Role;
+
+  @ManyToOne(() => Permission, permission => permission.rolePermissions, { onDelete: 'CASCADE' })
+  permission: Permission;
+}

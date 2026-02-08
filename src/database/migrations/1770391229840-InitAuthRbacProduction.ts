@@ -175,8 +175,9 @@ export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE role_permissions`);
     await queryRunner.query(`DROP TABLE user_roles`);
     await queryRunner.query(`DROP TABLE profiles`);
+    await queryRunner.query(`DROP TABLE IF EXISTS audit_logs`);
+    await queryRunner.query(`DROP TABLE users`);
     await queryRunner.query(`DROP TABLE permissions`);
     await queryRunner.query(`DROP TABLE roles`);
-    await queryRunner.query(`DROP TABLE users`);
   }
 }

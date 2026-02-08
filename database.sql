@@ -32,6 +32,7 @@ CREATE TABLE profiles (
     avatar VARCHAR(255),
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_profiles_user
       FOREIGN KEY (user_id) REFERENCES users(id)
@@ -145,3 +146,8 @@ SELECT r.id, p.id
 FROM roles r
 JOIN permissions p ON p.code = 'VIEW_DASHBOARD'
 WHERE r.code = 'USER';
+
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+SELECT tablename FROM pg_tables WHERE schemaname='public';
+select * from audit_logs
