@@ -5,6 +5,8 @@ import 'dotenv/config';
 import { join } from 'path';
 import { AppController } from 'src/app.controller';
 import { AppService } from 'src/app.service';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -17,10 +19,17 @@ import { AppService } from 'src/app.service';
       entities: [join(__dirname, '**/*.entity{.ts,.js}')],
       synchronize: false,
     }),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET_KEY,
+      signOptions: { expiresIn: '1h' },
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     AuthModule,
-    AppModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

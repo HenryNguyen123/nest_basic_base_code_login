@@ -1,9 +1,7 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
-
-    public async up(queryRunner: QueryRunner): Promise<void> {
-
+  public async up(queryRunner: QueryRunner): Promise<void> {
     // USERS
     await queryRunner.query(`
       CREATE TABLE users (
@@ -128,10 +126,18 @@ export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
 
     // INDEXES
     await queryRunner.query(`CREATE INDEX idx_users_email ON users(email)`);
-    await queryRunner.query(`CREATE INDEX idx_users_username ON users(user_name)`);
-    await queryRunner.query(`CREATE INDEX idx_user_roles_user ON user_roles(user_id)`);
-    await queryRunner.query(`CREATE INDEX idx_role_permissions_role ON role_permissions(role_id)`);
-    await queryRunner.query(`CREATE INDEX idx_refresh_user ON refresh_tokens(user_id)`);
+    await queryRunner.query(
+      `CREATE INDEX idx_users_username ON users(user_name)`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX idx_user_roles_user ON user_roles(user_id)`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX idx_role_permissions_role ON role_permissions(role_id)`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX idx_refresh_user ON refresh_tokens(user_id)`,
+    );
 
     // ===== SEED DATA =====
 
@@ -166,10 +172,52 @@ export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
       JOIN permissions p ON p.code = 'VIEW_DASHBOARD'
       WHERE r.code = 'USER'
     `);
+
+    // seed fake user
+    await queryRunner.query(`
+      INSERT INTO users (email, user_name, password)
+      VALUES
+      (
+        'admin@gmail.com',
+        'admin',
+        '$2b$10$rvYkmCsdWQpSVkW0BPp9RuHdHsnTpXuxOHjW5GGYyoy7aJ9.H/xsy'
+      ),
+      (
+        'user@gmail.com',
+        'user',
+        '$2b$10$rvYkmCsdWQpSVkW0BPp9RuHdHsnTpXuxOHjW5GGYyoy7aJ9.H/xsy'
+      )
+    `);
+    await queryRunner.query(`
+      INSERT INTO profiles (user_id, full_name, gender, dob, phone)
+      SELECT id, 'System Admin', 'Male', '1995-01-01', '0900000001'
+      FROM users WHERE user_name = 'admin'
+    `);
+
+    await queryRunner.query(`
+      INSERT INTO profiles (user_id, full_name, gender, dob, phone)
+      SELECT id, 'Normal User', 'Male', '2000-01-01', '0900000002'
+      FROM users WHERE user_name = 'user'
+    `);
+    // Admin → SUPER_ADMIN
+    await queryRunner.query(`
+      INSERT INTO user_roles (user_id, role_id)
+      SELECT u.id, r.id
+      FROM users u
+      JOIN roles r ON r.code = 'SUPER_ADMIN'
+      WHERE u.user_name = 'admin'
+    `);
+    // User → USER
+    await queryRunner.query(`
+      INSERT INTO user_roles (user_id, role_id)
+      SELECT u.id, r.id
+      FROM users u
+      JOIN roles r ON r.code = 'USER'
+      WHERE u.user_name = 'user'
+    `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-
     await queryRunner.query(`DROP TABLE audit_logs`);
     await queryRunner.query(`DROP TABLE refresh_tokens`);
     await queryRunner.query(`DROP TABLE role_permissions`);

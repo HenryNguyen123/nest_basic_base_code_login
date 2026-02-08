@@ -1,11 +1,27 @@
-import { IsBoolean, IsDate, IsEmail, IsNotEmpty, IsNumber, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsDate,
+  IsEmail,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { AuditLog } from 'src/audits/entities/audit-log.entity';
 import { RefreshToken } from 'src/auth/entities/refresh-token.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { Profile } from 'src/users/entities/profile.entity';
 import { Transform } from 'stream';
-import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -26,11 +42,10 @@ export class User {
   @MaxLength(150)
   email: string;
 
-  @Column()
+  @Column({ select: false })
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
-  @MaxLength(50)
   password: string;
 
   @Column({ name: 'is_active' })
@@ -49,11 +64,11 @@ export class User {
   @IsDate()
   lastLoginAt?: Date;
 
-  @Column()
+  @Column({ name: 'created_at' })
   @IsDate()
   createdAt: Date;
 
-  @Column()
+  @Column({ name: 'updated_at' })
   @IsDate()
   updatedAt: Date;
 
@@ -68,7 +83,4 @@ export class User {
 
   @OneToMany(() => AuditLog, (auditLog) => auditLog.user)
   auditLogs: AuditLog[];
-
-  @ManyToOne(() => Role, (role) => role.users)
-  role: Role;
 }
