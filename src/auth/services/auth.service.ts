@@ -18,6 +18,7 @@ import { RefreshToken } from 'src/auth/entities/refresh-token.entity';
 import { plainToInstance } from 'class-transformer';
 import { LoginResponseDto } from 'src/auth/dtos/response/login.response.dto';
 import ms, { StringValue } from 'ms';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class AuthService {
@@ -28,11 +29,13 @@ export class AuthService {
     private readonly refreshTokenRepository: Repository<RefreshToken>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
+    private readonly redisService: RedisService,
   ) {}
   // step: login
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto, ip: string) {
     // data login
     const { email, password } = loginDto;
+    const redisId = `user:${ip}`;
     const keyAccess = this.configService.get<string>(
       'JWT_ACCESS_TOKEN_SECRET_KEY',
     );
@@ -50,6 +53,12 @@ export class AuthService {
     if (!timeAccess || !timeRefresh || !keyAccess || !keyRefresh) {
       throw new InternalServerErrorException('Missing JWT configuration');
     }
+    // check redis
+    const countRedis = Number(await this.redisService.get(redisId) || 0);
+    console.log('User is locked for 5 minutes in redis count: ', countRedis);
+    if (countRedis >= 5) {
+      throw new UnauthorizedException('User is locked for 5 minutes');
+    }
     // check user exist
     const user = await this.userRepository
       .createQueryBuilder('user')
@@ -66,8 +75,15 @@ export class AuthService {
     // check password
     const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
+        // if (countRedis === 0) {
+            await this.redisService.incr(redisId, 300);
+        // } else {
+        //     await this.redisService.incr(redisId);
+        // }
       throw new UnauthorizedException('Invalid password');
     }
+    // reset redis
+    await this.redisService.del(redisId);
     // payload
     const roles = user.userRoles.map((userRole) => {
       return {

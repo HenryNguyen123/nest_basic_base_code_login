@@ -7,6 +7,7 @@ import { AppController } from 'src/app.controller';
 import { AppService } from 'src/app.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { RedisModule } from './redis/redis.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -21,13 +22,14 @@ import { ConfigModule } from '@nestjs/config';
     }),
     JwtModule.register({
       global: true,
-      secret: process.env.JWT_SECRET_KEY,
+      secret: process.env.JWT_ACCESS_TOKEN_SECRET_KEY,
       signOptions: { expiresIn: '1h' },
     }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     AuthModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

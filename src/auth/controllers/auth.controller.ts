@@ -3,6 +3,7 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Ip,
   Post,
 } from '@nestjs/common';
 import { LoginDto } from 'src/auth/dtos/request/login.request.dto';
@@ -16,7 +17,7 @@ export class AuthController {
   //step: login
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
-    return await this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto, @Ip() ip: string): Promise<LoginResponseDto> {
+    return await this.authService.login(loginDto, ip);
   }
 }
