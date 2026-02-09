@@ -21,11 +21,11 @@ export class Permission {
 
   @Column({ nullable: true })
   @IsString()
-  description?: string;
+  description: string;
 
   @Column({ nullable: true })
   @IsString()
-  module?: string;
+  module: string;
 
   @Column({ name: 'created_at' })
   created_at: Date;

@@ -17,7 +17,10 @@ export class AuthController {
   //step: login
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto, @Ip() ip: string): Promise<LoginResponseDto> {
+  async login(
+    @Body() loginDto: LoginDto,
+    @Ip() ip: string,
+  ): Promise<LoginResponseDto> {
     return await this.authService.login(loginDto, ip);
   }
 }

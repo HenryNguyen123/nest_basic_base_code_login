@@ -54,8 +54,7 @@ export class AuthService {
       throw new InternalServerErrorException('Missing JWT configuration');
     }
     // check redis
-    const countRedis = Number(await this.redisService.get(redisId) || 0);
-    console.log('User is locked for 5 minutes in redis count: ', countRedis);
+    const countRedis = Number((await this.redisService.get(redisId)) || 0);
     if (countRedis >= 5) {
       throw new UnauthorizedException('User is locked for 5 minutes');
     }
@@ -66,6 +65,8 @@ export class AuthService {
       .leftJoinAndSelect('user.profile', 'profile')
       .leftJoinAndSelect('user.userRoles', 'userRole')
       .leftJoinAndSelect('userRole.role', 'role')
+      .leftJoinAndSelect('role.rolePermissions', 'rolePermission')
+      .leftJoinAndSelect('rolePermission.permission', 'permission')
       .where('user.email = :email', { email })
       .andWhere('user.is_active = true')
       .getOne();
@@ -75,11 +76,8 @@ export class AuthService {
     // check password
     const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
-        // if (countRedis === 0) {
-            await this.redisService.incr(redisId, 300);
-        // } else {
-        //     await this.redisService.incr(redisId);
-        // }
+      // set redis
+      await this.redisService.incr(redisId, 300);
       throw new UnauthorizedException('Invalid password');
     }
     // reset redis
@@ -94,6 +92,14 @@ export class AuthService {
     const roleCode = user.userRoles.map((userRole) => {
       return userRole.role.code;
     });
+    // const permissionCodes = user.userRoles.map((userRole) => {
+    //   return userRole.role.rolePermissions.map((rolePermission) => {
+    //     return rolePermission.permission.code;
+    //   });
+    // });
+    const permissionCodes = user.userRoles.flatMap(userRole =>
+      userRole.role.rolePermissions.map(rp => rp.permission.code),
+    );
     const payload: IPayloadLogin = {
       email: user.email,
       userName: user.userName,
@@ -110,6 +116,7 @@ export class AuthService {
     const payloadJWT: IPayloadJWTLogin = {
       sub: user.id,
       roleCode: roleCode,
+      permissionCodes: permissionCodes,
     };
     // generate token
     const accessToken = await this.jwtService.signAsync(payloadJWT, {

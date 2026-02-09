@@ -3,16 +3,16 @@ import Redis from 'ioredis';
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
-    private client: Redis;
+  private client: Redis;
   constructor() {
     this.client = new Redis({
-        host: process.env.REDIS_HOST || 'localhost',
-        port: Number(process.env.REDIS_PORT) || 6379,
-        password: process.env.REDIS_PASSWORD,
-        retryStrategy: (times) => {
-            return Math.min(times * 50, 2000);
-        }
-    })
+      host: process.env.REDIS_HOST || 'localhost',
+      port: Number(process.env.REDIS_PORT) || 6379,
+      password: process.env.REDIS_PASSWORD,
+      retryStrategy: (times) => {
+        return Math.min(times * 50, 2000);
+      },
+    });
   }
 
   // step: set value
@@ -39,7 +39,7 @@ export class RedisService implements OnModuleDestroy {
   async incr(key: string, ttl?: number) {
     const value = await this.client.incr(key);
     if (ttl && value === 1) {
-        await this.client.expire(key, ttl); 
+      await this.client.expire(key, ttl);
     }
     return value;
   }

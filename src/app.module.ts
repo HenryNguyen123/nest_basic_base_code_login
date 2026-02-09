@@ -8,6 +8,7 @@ import { AppService } from 'src/app.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from './redis/redis.module';
+import { CategoryModule } from 'src/categories/category.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -30,6 +31,7 @@ import { RedisModule } from './redis/redis.module';
     }),
     AuthModule,
     RedisModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

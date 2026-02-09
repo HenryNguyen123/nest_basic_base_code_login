@@ -10,9 +10,6 @@ import { Permission } from '../../permissions/entities/permission.entity';
 
 @Entity('role_permissions')
 export class RolePermission {
-  @PrimaryGeneratedColumn()
-  id: number;
-
   @PrimaryColumn({ name: 'role_id' })
   roleId: number;
 

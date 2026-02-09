@@ -39,6 +39,7 @@ export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
         id SERIAL PRIMARY KEY,
         name VARCHAR(150) NOT NULL,
         code VARCHAR(100) NOT NULL UNIQUE,
+        description VARCHAR(255),
         module VARCHAR(100),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -214,6 +215,33 @@ export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
       FROM users u
       JOIN roles r ON r.code = 'USER'
       WHERE u.user_name = 'user'
+    `);
+    //fake permission
+    await queryRunner.query(`
+      INSERT INTO permissions (name, code, module)
+      VALUES
+      ('Create Category', 'CREATE_CATEGORY', 'CATEGORY'),
+      ('Update Category', 'UPDATE_CATEGORY', 'CATEGORY'),
+      ('Delete Category', 'DELETE_CATEGORY', 'CATEGORY'),
+      ('View Category Detail', 'VIEW_CATEGORY', 'CATEGORY'),
+      ('List Categories', 'LIST_CATEGORY', 'CATEGORY'),
+      ('test Categories', 'TEST_CATEGORY', 'CATEGORY')
+    `);
+    //SUPER_ADMIN full quyền
+    await queryRunner.query(`
+      INSERT INTO role_permissions (role_id, permission_id)
+      SELECT r.id, p.id
+      FROM roles r
+      JOIN permissions p ON p.code = 'TEST_CATEGORY'
+      WHERE r.code = 'SUPER_ADMIN'
+    `);
+    //USER chỉ có quyền test
+    await queryRunner.query(`
+      INSERT INTO role_permissions (role_id, permission_id)
+      SELECT r.id, p.id
+      FROM roles r
+      JOIN permissions p ON p.code = 'TEST_CATEGORY'
+      WHERE r.code = 'USER'
     `);
   }
 
