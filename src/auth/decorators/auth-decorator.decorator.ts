@@ -6,17 +6,10 @@ import { RolesGuard } from 'src/roles/guards/roles.guard';
 import { PermissionsGuard } from 'src/permissions/guards/permissions.guard';
 import { RoleEnum } from 'src/roles/enums/role.enum';
 
-export function Auth(
-  roles?: RoleEnum[],
-  permissions?: string[],
-) {
+export function Auth(roles?: RoleEnum[], permissions?: string[]) {
   return applyDecorators(
     Roles(...(roles || [])),
     Permissions(...(permissions || [])),
-    UseGuards(
-      JwtAuthGuard,
-      RolesGuard,
-      PermissionsGuard,
-    ),
+    UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard),
   );
 }

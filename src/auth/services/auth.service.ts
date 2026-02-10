@@ -97,8 +97,8 @@ export class AuthService {
     //     return rolePermission.permission.code;
     //   });
     // });
-    const permissionCodes = user.userRoles.flatMap(userRole =>
-      userRole.role.rolePermissions.map(rp => rp.permission.code),
+    const permissionCodes = user.userRoles.flatMap((userRole) =>
+      userRole.role.rolePermissions.map((rp) => rp.permission.code),
     );
     const payload: IPayloadLogin = {
       email: user.email,
@@ -138,7 +138,7 @@ export class AuthService {
     });
     await this.refreshTokenRepository.save(refreshTokenEntity);
     // response
-    return  plainToInstance(LoginResponseDto, {
+    return plainToInstance(LoginResponseDto, {
       accessToken,
       refreshToken,
       user: payload,

@@ -1,8 +1,13 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreatePermissionRequestDto {
-
   @ApiProperty({ example: 'Create Category' })
   @IsNotEmpty()
   @IsString()

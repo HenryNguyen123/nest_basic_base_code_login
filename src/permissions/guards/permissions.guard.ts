@@ -14,11 +14,10 @@ export class PermissionsGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredPermissions =
-      this.reflector.getAllAndOverride<string[]>(
-        PERMISSION_KEY,
-        [context.getHandler(), context.getClass()],
-      );
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
+      PERMISSION_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     // Không set permission → cho qua sau JWT
     if (!requiredPermissions || requiredPermissions.length === 0) {
@@ -32,7 +31,7 @@ export class PermissionsGuard implements CanActivate {
       throw new ForbiddenException('No permissions assigned');
     }
 
-    const hasPermission = requiredPermissions.every(permission =>
+    const hasPermission = requiredPermissions.every((permission) =>
       user.permissionCodes.includes(permission),
     );
 

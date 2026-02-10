@@ -12,14 +12,14 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @ApiBearerAuth()
 @Controller('categories')
 export class CategoryController {
-    constructor() { }
+  constructor() {}
 
-    //test
-    @Get('test')
-    @Roles(RoleEnum.USER, RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN)
-    @Permissions(PermissionEnum.TEST_CATEGORY)
-    @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
-    test() {
-        return 'test';
-    }
+  //test
+  @Get('test')
+  @Roles(RoleEnum.USER, RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN)
+  @Permissions(PermissionEnum.TEST_CATEGORY)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+  test() {
+    return 'test';
+  }
 }
