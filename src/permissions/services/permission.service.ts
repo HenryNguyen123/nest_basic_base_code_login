@@ -2,11 +2,13 @@ import { ConflictException, Injectable, NotFoundException } from "@nestjs/common
 import { InjectRepository } from "@nestjs/typeorm";
 import { plainToInstance } from "class-transformer";
 import { CreatePermissionRequestDto } from "src/permissions/dtos/request/create-permission.request.dto";
+import { ListPermissionRequestDto } from "src/permissions/dtos/request/list-permission.request.dto";
+import { PaginationPermissionResponseDto } from "src/permissions/dtos/response/pagination-permission.response.dto";
 import { PermissionResponseDto } from "src/permissions/dtos/response/permission-response.response.dto";
 import { Permission } from "src/permissions/entities/permission.entity";
 import { RolePermission } from "src/permissions/entities/role-permission.entity";
 import { Role } from "src/roles/entities/role.entity";
-import { In, Repository } from "typeorm";
+import { In, Like, Repository } from "typeorm";
 
 @Injectable()
 export class PermissionService {
@@ -19,21 +21,31 @@ export class PermissionService {
         private readonly rolePermissionRepository: Repository<RolePermission>,
     ) { }
     // step: get all permission
-    async findAll(): Promise<PermissionResponseDto[]> {
-        const permissions = await this.permissionRepository.find(
+    async findAll(query: ListPermissionRequestDto): Promise<PaginationPermissionResponseDto> {
+        const { search, page = 1, limit = 10 } = query;
+        const [permissions, total] = await this.permissionRepository.findAndCount(
             {
+                where: search ? { name: Like(`%${search}%`) } : {},
+                order: {
+                    name: 'ASC',
+                },
                 relations: {
                     rolePermissions: {
                         role: true,
                     },
                 },
-                order: {
-                    name: 'ASC',
-                },
+                skip: (page - 1) * limit,
+                take: limit,
             }
         );
-        return plainToInstance(PermissionResponseDto, permissions, {
-            excludeExtraneousValues: true,
+        return plainToInstance(PaginationPermissionResponseDto, {
+            meta: {
+                page,
+                limit,
+                totalItems: total,
+                totalPages: Math.ceil(total / limit),
+            },
+            data: permissions,
         });
     }
 
