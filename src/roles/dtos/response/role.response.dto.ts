@@ -6,4 +6,10 @@ export class RoleResponseDto {
 
   @Expose()
   code: string;
+
+  @Expose()
+  description?: string;
+
+  @Expose()
+  createdAt?: Date;
 }

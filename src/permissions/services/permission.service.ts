@@ -15,12 +15,21 @@ export class PermissionService {
         private readonly rolePermissionRepository: Repository<RolePermission>,
     ) { }
     // step: findAll
-    async findAll() {
+    async findAll(): Promise<PermissionResponseDto[]> {
         const permissions = await this.permissionRepository.find(
             {
-                relations: ['rolePermissions']
+                relations: {
+                    rolePermissions: {
+                        role: true,
+                    },
+                },
+                order: {
+                    name: 'ASC',
+                },
             }
         );
-        return plainToInstance(PermissionResponseDto, permissions);
+        return plainToInstance(PermissionResponseDto, permissions, {
+            excludeExtraneousValues: true,
+        });
     }
 }

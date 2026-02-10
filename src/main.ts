@@ -6,6 +6,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // set global prefix
+  app.setGlobalPrefix('api/v1');
+  // set global pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -22,7 +25,7 @@ async function bootstrap() {
     .addBearerAuth() // for jwt token
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api/v1', app, document);
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
