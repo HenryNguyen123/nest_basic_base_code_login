@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from './redis/redis.module';
 import { CategoryModule } from 'src/categories/category.module';
+import { PermissionModule } from 'src/permissions/permission.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -32,6 +33,7 @@ import { CategoryModule } from 'src/categories/category.module';
     AuthModule,
     RedisModule,
     CategoryModule,
+    PermissionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

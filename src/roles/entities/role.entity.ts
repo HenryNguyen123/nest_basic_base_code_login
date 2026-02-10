@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
-import { RolePermission } from 'src/roles/entities/role-permission.entity';
+import { RolePermission } from 'src/permissions/entities/role-permission.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
