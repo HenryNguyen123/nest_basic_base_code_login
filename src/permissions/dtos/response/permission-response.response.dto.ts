@@ -1,5 +1,5 @@
 import { Expose, Type } from "class-transformer";
-import { RolePermissionResponseDto } from "src/permissions/dtos/response/role-permission.response";
+import { RolePermissionResponseDto } from "src/permissions/dtos/response/role-permission.response.dto";
 
 export class PermissionResponseDto {
     @Expose()
@@ -10,6 +10,12 @@ export class PermissionResponseDto {
 
     @Expose()
     description: string;
+
+    @Expose()
+    code: string;
+
+    @Expose()
+    module: string;
 
     @Expose()
     createdAt?: Date;
