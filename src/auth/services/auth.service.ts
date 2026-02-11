@@ -144,4 +144,30 @@ export class AuthService {
       user: payload,
     });
   }
+
+  // step: logout
+  async logout(user: IPayloadJWTLogin, ip: string) {
+    if (!user.sub) {
+      throw new UnauthorizedException('User not found');
+    }
+    const userExist = await this.userRepository.findOneBy({
+      id: user.sub,
+    });
+    if (!userExist) {
+      throw new UnauthorizedException('User not found');
+    }
+    // check refresh token
+    const refreshToken = await this.refreshTokenRepository.findOneBy({
+      userId: user.sub,
+    });
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token not found');
+    }
+    // delete refresh token
+    await this.refreshTokenRepository.delete({
+      userId: user.sub,
+    });
+    // delete redis
+    await this.redisService.del(`user:${ip}`);
+  }
 }
