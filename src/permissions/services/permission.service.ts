@@ -63,9 +63,7 @@ export class PermissionService {
   }
 
   // step: find permission by id
-  async findOne(
-    id: number,
-  ): Promise<PermissionResponseDto> {
+  async findOne(id: number): Promise<PermissionResponseDto> {
     const permission = await this.permissionRepository.findOne({
       where: {
         id,
@@ -127,7 +125,7 @@ export class PermissionService {
       excludeExtraneousValues: true,
     });
   }
-  
+
   //step: update permission by id
   async update(
     id: number,
@@ -178,9 +176,7 @@ export class PermissionService {
   }
 
   // step: delete permission by id
-  async destroy(
-    id: number,
-  ): Promise<PermissionResponseDto> {
+  async destroy(id: number): Promise<PermissionResponseDto> {
     const permission = await this.permissionRepository.findOne({
       where: {
         id,

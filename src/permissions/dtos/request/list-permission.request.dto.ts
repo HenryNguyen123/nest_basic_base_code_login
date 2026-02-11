@@ -26,7 +26,7 @@ export class ListPermissionRequestDto {
     required: false,
   })
   @IsOptional()
-  @Type(() => Number)  
+  @Type(() => Number)
   @IsNumber()
   limit?: number = 10;
 }

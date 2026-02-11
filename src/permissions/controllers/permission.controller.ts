@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { Auth } from 'src/auth/decorators/auth-decorator.decorator';
 import { PermissionService } from 'src/permissions/services/permission.service';
 import { RoleEnum } from 'src/roles/enums/role.enum';
