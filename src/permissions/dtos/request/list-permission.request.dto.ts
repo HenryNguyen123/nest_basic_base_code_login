@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class ListPermissionRequestDto {
@@ -8,6 +8,7 @@ export class ListPermissionRequestDto {
     required: false,
   })
   @IsOptional()
+  @Transform(({ value }) => value.trim())
   @IsString()
   search?: string;
 
@@ -25,7 +26,7 @@ export class ListPermissionRequestDto {
     required: false,
   })
   @IsOptional()
-  @Type(() => Number)
+  @Type(() => Number)  
   @IsNumber()
   limit?: number = 10;
 }
