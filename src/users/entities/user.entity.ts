@@ -52,6 +52,10 @@ export class User {
   @IsBoolean()
   isActive: boolean;
 
+  @Column({ name: 'is_verified' })
+  @IsBoolean()
+  isVerified: boolean;
+
   @Column({ name: 'failed_login_attempts' })
   @IsNumber()
   failedLoginAttempts: number;

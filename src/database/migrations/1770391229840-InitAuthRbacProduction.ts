@@ -12,6 +12,7 @@ export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
         password VARCHAR(255) NOT NULL,
 
         is_active BOOLEAN DEFAULT TRUE,
+        is_verified BOOLEAN DEFAULT FALSE,
 
         failed_login_attempts INT DEFAULT 0,
         locked_until TIMESTAMP NULL,

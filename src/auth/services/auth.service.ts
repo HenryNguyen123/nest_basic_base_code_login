@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -8,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
-import { comparePassword } from 'src/commons/utils/password.util';
+import { comparePassword, hashPassword } from 'src/commons/utils/password.util';
 import { JwtService } from '@nestjs/jwt';
 import {
   IPayloadJWTLogin,
@@ -19,6 +20,11 @@ import { plainToInstance } from 'class-transformer';
 import { LoginResponseDto } from 'src/auth/dtos/response/login.response.dto';
 import ms, { StringValue } from 'ms';
 import { RedisService } from 'src/redis/redis.service';
+import { RegisterDto } from 'src/auth/dtos/request/register.request.dto';
+import { Profile } from 'src/users/entities/profile.entity';
+import { Role } from 'src/roles/entities/role.entity';
+import { RoleEnum } from 'src/roles/enums/role.enum';
+import { UserRole } from 'src/roles/entities/user-role.entity';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +33,12 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(RefreshToken)
     private readonly refreshTokenRepository: Repository<RefreshToken>,
+    @InjectRepository(Profile)
+    private readonly profileRepository: Repository<Profile>,
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
+    @InjectRepository(UserRole)
+    private readonly userRoleRepository: Repository<UserRole>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
@@ -169,5 +181,52 @@ export class AuthService {
     });
     // delete redis
     await this.redisService.del(`user:${ip}`);
+  }
+
+  // step: register
+  async register(registerDto: RegisterDto) {
+    const { email, password, userName, fullName, gender, dob, phone } = registerDto;
+    // const RoleUserCode = RoleCodeEnum.USER;
+    // check user exist
+    const user = await this.userRepository.findOne({
+      where: [
+        { email },
+        { userName },
+      ],
+    });
+    if (user) {
+      throw new ConflictException('Email or username already exists');
+    }
+    // hash password
+    const hash = await hashPassword(password);
+    // create user
+    const userEntity = this.userRepository.create({
+      email,
+      password: hash,
+      userName,
+    });
+    await this.userRepository.save(userEntity);
+    // create profile
+    const profileEntity = this.profileRepository.create({
+      user: userEntity,
+      fullName,
+      gender,
+      dob,
+      phone,
+    });
+    await this.profileRepository.save(profileEntity);
+    // get Role
+    const role = await this.roleRepository.findOneBy({
+      code: RoleEnum.USER,
+    });
+    if (!role) {
+      throw new InternalServerErrorException('Role not found');
+    }
+    // create user role
+    const userRoleEntity = this.userRoleRepository.create({
+      user: userEntity,
+      role,
+    });
+    await this.userRoleRepository.save(userRoleEntity);
   }
 }

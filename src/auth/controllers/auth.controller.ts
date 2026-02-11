@@ -14,6 +14,7 @@ import { LoginResponseDto } from 'src/auth/dtos/response/login.response.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import type { Request } from 'express';
+import { RegisterDto } from 'src/auth/dtos/request/register.request.dto';
 
 @ApiTags('auth')
 @ApiBearerAuth()
@@ -38,5 +39,14 @@ export class AuthController {
   async logout(@Ip() ip: string, @Req() req: Request): Promise<void> {
     const user = req['user'];
     await this.authService.logout(user, ip);
+  }
+
+  // step: register
+  @Post('register')
+  @HttpCode(HttpStatus.CREATED)
+  async register(
+    @Body() registerDto: RegisterDto,
+  ): Promise<void> {
+    await this.authService.register(registerDto);
   }
 }

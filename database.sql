@@ -11,6 +11,7 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
 
   is_active BOOLEAN DEFAULT TRUE,
+  is_verified BOOLEAN DEFAULT FALSE,
 
   failed_login_attempts INT DEFAULT 0,
   locked_until TIMESTAMP NULL,
