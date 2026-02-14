@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from './redis/redis.module';
 import { CategoryModule } from 'src/categories/category.module';
 import { PermissionModule } from 'src/permissions/permission.module';
+import { MailModule } from 'src/mails/mail.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -34,6 +35,7 @@ import { PermissionModule } from 'src/permissions/permission.module';
     RedisModule,
     CategoryModule,
     PermissionModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

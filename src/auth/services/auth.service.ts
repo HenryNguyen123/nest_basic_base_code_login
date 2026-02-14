@@ -25,6 +25,7 @@ import { Profile } from 'src/users/entities/profile.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import { RoleEnum } from 'src/roles/enums/role.enum';
 import { UserRole } from 'src/roles/entities/user-role.entity';
+import { pathFileName } from 'src/commons/utils/path-file-name.util';
 
 @Injectable()
 export class AuthService {
@@ -42,7 +43,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
-  ) {}
+  ) { }
   // step: login
   async login(loginDto: LoginDto, ip: string) {
     // data login
@@ -184,7 +185,7 @@ export class AuthService {
   }
 
   // step: register
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto, file: Express.Multer.File | null, path: string) {
     const { email, password, userName, fullName, gender, dob, phone } = registerDto;
     // const RoleUserCode = RoleCodeEnum.USER;
     // check user exist
@@ -207,12 +208,17 @@ export class AuthService {
     });
     await this.userRepository.save(userEntity);
     // create profile
+    let pathAvatar: string | null = null;
+    if (file) {
+      pathAvatar = pathFileName(file, path);
+    }
     const profileEntity = this.profileRepository.create({
       user: userEntity,
       fullName,
       gender,
       dob,
       phone,
+      avatar: pathAvatar ?? undefined,
     });
     await this.profileRepository.save(profileEntity);
     // get Role

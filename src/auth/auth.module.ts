@@ -5,9 +5,12 @@ import { User } from 'src/users/entities/user.entity';
 import { AuthService } from 'src/auth/services/auth.service';
 import { RefreshToken } from 'src/auth/entities/refresh-token.entity';
 import { RedisService } from 'src/redis/redis.service';
+import { Profile } from 'src/users/entities/profile.entity';
+import { Role } from 'src/roles/entities/role.entity';
+import { UserRole } from 'src/roles/entities/user-role.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, RefreshToken])],
+  imports: [TypeOrmModule.forFeature([User, RefreshToken, Profile, Role, UserRole])],
   controllers: [AuthController],
   providers: [AuthService, RedisService],
   exports: [AuthService],

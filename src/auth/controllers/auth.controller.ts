@@ -6,7 +6,9 @@ import {
   Ip,
   Post,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { LoginDto } from 'src/auth/dtos/request/login.request.dto';
 import { AuthService } from '../services/auth.service';
@@ -15,6 +17,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import type { Request } from 'express';
 import { RegisterDto } from 'src/auth/dtos/request/register.request.dto';
+import { UploadFileInterceptor } from 'src/commons/interceptors/upload-file.interceptor';
 
 @ApiTags('auth')
 @ApiBearerAuth()
@@ -44,9 +47,12 @@ export class AuthController {
   // step: register
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(UploadFileInterceptor('avatar', 'public/images/avatar'))
   async register(
     @Body() registerDto: RegisterDto,
+    @UploadedFile() file: Express.Multer.File | null,
   ): Promise<void> {
-    await this.authService.register(registerDto);
+    const path = '/images/avatar';
+    await this.authService.register(registerDto, file, path);
   }
 }
