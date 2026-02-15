@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsDate, IsEmail, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class RegisterDto {
   @ApiProperty({
@@ -35,6 +35,8 @@ export class RegisterDto {
     example: 'John Doe',
     required: false,
   })
+  @IsOptional()
+  @Transform(({ value }) => value === '' ? undefined : value)
   @IsString()
   @MinLength(3)
   @MaxLength(100)
@@ -44,6 +46,8 @@ export class RegisterDto {
     example: 'male',
     required: false,
   })
+  @IsOptional()
+  @Transform(({ value }) => value === '' ? undefined : value)
   @IsString()
   @MinLength(3)
   @MaxLength(100)
@@ -53,7 +57,12 @@ export class RegisterDto {
     example: '1990-01-01',
     required: false,
   })
-  @Type(() => Date)
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (!value) return undefined;
+    return new Date(value);
+  })
+  // @Type(() => Date)
   @IsDate()
   dob?: string;
 
@@ -61,8 +70,18 @@ export class RegisterDto {
     example: '0123456789',
     required: false,
   })
+  @IsOptional()
+  @Transform(({ value }) => value === '' ? undefined : value)
   @IsString()
   @MinLength(10)
   @MaxLength(15)
   phone?: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+  })
+  @IsOptional()
+  avatar?: any;
 }

@@ -13,7 +13,7 @@ import {
 import { LoginDto } from 'src/auth/dtos/request/login.request.dto';
 import { AuthService } from '../services/auth.service';
 import { LoginResponseDto } from 'src/auth/dtos/response/login.response.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import type { Request } from 'express';
 import { RegisterDto } from 'src/auth/dtos/request/register.request.dto';
@@ -47,7 +47,11 @@ export class AuthController {
   // step: register
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(UploadFileInterceptor('avatar', 'public/images/avatar'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    type: RegisterDto,
+  })
+  @UseInterceptors(UploadFileInterceptor('avatar', './public/images/avatar'))
   async register(
     @Body() registerDto: RegisterDto,
     @UploadedFile() file: Express.Multer.File | null,
