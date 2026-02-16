@@ -48,7 +48,6 @@ export class AuthService {
   async login(loginDto: LoginDto, ip: string) {
     // data login
     const { email, password } = loginDto;
-    const redisId = `user:${ip}`;
     const keyAccess = this.configService.get<string>(
       'JWT_ACCESS_TOKEN_SECRET_KEY',
     );
@@ -66,11 +65,7 @@ export class AuthService {
     if (!timeAccess || !timeRefresh || !keyAccess || !keyRefresh) {
       throw new InternalServerErrorException('Missing JWT configuration');
     }
-    // check redis
-    const countRedis = Number((await this.redisService.get(redisId)) || 0);
-    if (countRedis >= 5) {
-      throw new UnauthorizedException('User is locked for 5 minutes');
-    }
+
     // check user exist
     const user = await this.userRepository
       .createQueryBuilder('user')
@@ -85,6 +80,12 @@ export class AuthService {
       .getOne();
     if (!user) {
       throw new UnauthorizedException('User not found');
+    }
+    // check redis
+    const redisId = `user:${ip}:${user.email}`;
+    const countRedis = Number((await this.redisService.get(redisId)) || 0);
+    if (countRedis >= 5) {
+      throw new UnauthorizedException('User is locked for 5 minutes');
     }
     // check password
     const isPasswordValid = await comparePassword(password, user.password);
@@ -181,7 +182,7 @@ export class AuthService {
       userId: user.sub,
     });
     // delete redis
-    await this.redisService.del(`user:${ip}`);
+    await this.redisService.del(`user:${ip}:${userExist.email}`);
   }
 
   // step: register
