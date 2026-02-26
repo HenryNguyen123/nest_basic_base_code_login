@@ -112,6 +112,26 @@ export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
       )
     `);
 
+    // VERIFY TOKENS
+    await queryRunner.query(`
+      CREATE TABLE verify_tokens (
+        id SERIAL PRIMARY KEY,
+        token TEXT NOT NULL UNIQUE,
+
+        user_id BIGINT NOT NULL,
+
+        expired_at TIMESTAMP NOT NULL,
+        is_used BOOLEAN DEFAULT FALSE,
+
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+        CONSTRAINT fk_verify_user
+          FOREIGN KEY (user_id)
+          REFERENCES users(id)
+          ON DELETE CASCADE
+      )
+    `);
+
     // AUDIT LOGS
     await queryRunner.query(`
       CREATE TABLE audit_logs (
@@ -140,6 +160,12 @@ export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
     await queryRunner.query(
       `CREATE INDEX idx_refresh_user ON refresh_tokens(user_id)`,
     );
+    await queryRunner.query(`
+      CREATE INDEX idx_verify_tokens_user ON verify_tokens(user_id)
+    `);
+    await queryRunner.query(`
+      CREATE INDEX idx_verify_tokens_token ON verify_tokens(token)
+    `);
 
     // ===== SEED DATA =====
 
@@ -247,14 +273,14 @@ export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP TABLE audit_logs`);
-    await queryRunner.query(`DROP TABLE refresh_tokens`);
-    await queryRunner.query(`DROP TABLE role_permissions`);
-    await queryRunner.query(`DROP TABLE user_roles`);
-    await queryRunner.query(`DROP TABLE profiles`);
     await queryRunner.query(`DROP TABLE IF EXISTS audit_logs`);
-    await queryRunner.query(`DROP TABLE users`);
-    await queryRunner.query(`DROP TABLE permissions`);
-    await queryRunner.query(`DROP TABLE roles`);
+    await queryRunner.query(`DROP TABLE IF EXISTS verify_tokens`);
+    await queryRunner.query(`DROP TABLE IF EXISTS refresh_tokens`);
+    await queryRunner.query(`DROP TABLE IF EXISTS role_permissions`);
+    await queryRunner.query(`DROP TABLE IF EXISTS user_roles`);
+    await queryRunner.query(`DROP TABLE IF EXISTS profiles`);
+    await queryRunner.query(`DROP TABLE IF EXISTS permissions`);
+    await queryRunner.query(`DROP TABLE IF EXISTS roles`);
+    await queryRunner.query(`DROP TABLE IF EXISTS users`);
   }
 }

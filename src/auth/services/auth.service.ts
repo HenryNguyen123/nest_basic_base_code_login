@@ -26,6 +26,9 @@ import { Role } from 'src/roles/entities/role.entity';
 import { RoleEnum } from 'src/roles/enums/role.enum';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { pathFileName } from 'src/commons/utils/path-file-name.util';
+import { MailService } from 'src/mails/services/mail.service';
+import { randomUUID } from 'crypto';
+import { VerifyToken } from 'src/auth/entities/verify-token.entity';
 
 @Injectable()
 export class AuthService {
@@ -40,9 +43,12 @@ export class AuthService {
     private readonly roleRepository: Repository<Role>,
     @InjectRepository(UserRole)
     private readonly userRoleRepository: Repository<UserRole>,
+    @InjectRepository(VerifyToken)
+    private readonly verifyTokenRepository: Repository<VerifyToken>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
+    private readonly mailService: MailService,
   ) { }
   // step: login
   async login(loginDto: LoginDto, ip: string) {
@@ -159,7 +165,7 @@ export class AuthService {
     });
   }
 
-  // step: logout
+  // step: logout2
   async logout(user: IPayloadJWTLogin, ip: string) {
     if (!user.sub) {
       throw new UnauthorizedException('User not found');
@@ -188,6 +194,7 @@ export class AuthService {
   // step: register
   async register(registerDto: RegisterDto, file: Express.Multer.File | null, path: string) {
     const { email, password, userName, fullName, gender, dob, phone } = registerDto;
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
     // const RoleUserCode = RoleCodeEnum.USER;
     // check user exist
     const user = await this.userRepository.findOne({
@@ -235,5 +242,57 @@ export class AuthService {
       role,
     });
     await this.userRoleRepository.save(userRoleEntity);
+    // send verify mail
+    const uuid = randomUUID();
+    // check verify token
+    const checkVerifyToken = await this.verifyTokenRepository.findOneBy({
+      userId: userEntity.id,
+    });
+    if (checkVerifyToken) {
+      await this.verifyTokenRepository.delete({
+        userId: userEntity.id,
+      });
+    }
+    // create verify token
+    const verifyTokenEntity = this.verifyTokenRepository.create({
+      userId: userEntity.id,
+      token: uuid,
+      expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    });
+    await this.verifyTokenRepository.save(verifyTokenEntity);
+    await this.mailService.sendVerifyMail(email, profileEntity.fullName, `${frontendUrl}/verify?token=${uuid}`, '24h');
+  }
+
+  // step: send mail verify
+  async sendMailVerify(email: string) {
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
+    const uuid = randomUUID();
+    const user = await this.userRepository.findOne({
+      where: {
+        email,
+      },
+      relations: {
+        profile: true,
+      },
+    });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    const verifyToken = await this.verifyTokenRepository.findOneBy({
+      userId: user.id,
+    });
+    if (verifyToken) {
+      await this.verifyTokenRepository.delete({
+        userId: user.id,
+      });
+    }
+    // create verify token
+    const verifyTokenEntity = this.verifyTokenRepository.create({
+      userId: user.id,
+      token: uuid,
+      expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    });
+    await this.verifyTokenRepository.save(verifyTokenEntity);
+    await this.mailService.sendVerifyMail(email, user.profile.fullName, `${frontendUrl}/verify?token=${uuid}`, '24h');
   }
 }

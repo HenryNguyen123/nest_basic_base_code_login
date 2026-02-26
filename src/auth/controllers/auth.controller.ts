@@ -18,6 +18,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import type { Request } from 'express';
 import { RegisterDto } from 'src/auth/dtos/request/register.request.dto';
 import { UploadFileInterceptor } from 'src/commons/interceptors/upload-file.interceptor';
+import { VerifyDto } from 'src/auth/dtos/request/verify.request.dto';
 
 @ApiTags('auth')
 @ApiBearerAuth()
@@ -58,5 +59,12 @@ export class AuthController {
   ): Promise<void> {
     const path = '/images/avatar';
     await this.authService.register(registerDto, file, path);
+  }
+
+  // step: send mail verify
+  @Post('send-mail-verify')
+  @HttpCode(HttpStatus.OK)
+  async sendMailVerify(@Body() body: VerifyDto): Promise<void> {
+    await this.authService.sendMailVerify(body.email);
   }
 }
