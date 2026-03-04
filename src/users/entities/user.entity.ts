@@ -10,6 +10,7 @@ import {
 } from 'class-validator';
 import { AuditLog } from 'src/audits/entities/audit-log.entity';
 import { RefreshToken } from 'src/auth/entities/refresh-token.entity';
+import { ResetPasswordToken } from 'src/auth/entities/reset-password-token.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { Profile } from 'src/users/entities/profile.entity';
@@ -87,4 +88,7 @@ export class User {
 
   @OneToMany(() => AuditLog, (auditLog) => auditLog.user)
   auditLogs: AuditLog[];
+
+  @OneToMany(() => ResetPasswordToken, (token) => token.user)
+  resetTokens: ResetPasswordToken[];
 }

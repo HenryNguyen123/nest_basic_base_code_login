@@ -98,6 +98,30 @@ CREATE TABLE refresh_tokens (
         REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- VERIFY TOKEN
+CREATE TABLE verify_tokens (
+    id SERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    token TEXT NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_vt_user FOREIGN KEY (user_id)
+        REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- RESET PASSWORD TOKEN
+CREATE TABLE reset_password_tokens (
+    id SERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    token TEXT NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_rpt_user FOREIGN KEY (user_id)
+        REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- AUDIT LOGS
 CREATE TABLE audit_logs (
     id SERIAL PRIMARY KEY,

@@ -5,9 +5,7 @@ import { Injectable, Logger } from '@nestjs/common';
 export class MailUtil {
   private readonly logger = new Logger(MailUtil.name);
 
-  constructor(
-    private readonly mailerService: MailerService,
-  ) {}
+  constructor(private readonly mailerService: MailerService) {}
 
   async send(
     to: string,

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -27,8 +28,10 @@ import { RoleEnum } from 'src/roles/enums/role.enum';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { pathFileName } from 'src/commons/utils/path-file-name.util';
 import { MailService } from 'src/mails/services/mail.service';
-import { randomUUID } from 'crypto';
+import { createHash, randomBytes, randomUUID } from 'crypto';
 import { VerifyToken } from 'src/auth/entities/verify-token.entity';
+import { VerifyDto } from 'src/auth/dtos/request/verify.request.dto';
+import { ResetPasswordToken } from 'src/auth/entities/reset-password-token.entity';
 
 @Injectable()
 export class AuthService {
@@ -45,11 +48,13 @@ export class AuthService {
     private readonly userRoleRepository: Repository<UserRole>,
     @InjectRepository(VerifyToken)
     private readonly verifyTokenRepository: Repository<VerifyToken>,
+    @InjectRepository(ResetPasswordToken)
+    private readonly resetPasswordTokenRepository: Repository<ResetPasswordToken>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
     private readonly mailService: MailService,
-  ) { }
+  ) {}
   // step: login
   async login(loginDto: LoginDto, ip: string) {
     // data login
@@ -192,16 +197,18 @@ export class AuthService {
   }
 
   // step: register
-  async register(registerDto: RegisterDto, file: Express.Multer.File | null, path: string) {
-    const { email, password, userName, fullName, gender, dob, phone } = registerDto;
+  async register(
+    registerDto: RegisterDto,
+    file: Express.Multer.File | null,
+    path: string,
+  ) {
+    const { email, password, userName, fullName, gender, dob, phone } =
+      registerDto;
     const frontendUrl = this.configService.get<string>('FRONTEND_URL');
     // const RoleUserCode = RoleCodeEnum.USER;
     // check user exist
     const user = await this.userRepository.findOne({
-      where: [
-        { email },
-        { userName },
-      ],
+      where: [{ email }, { userName }],
     });
     if (user) {
       throw new ConflictException('Email or username already exists');
@@ -260,7 +267,12 @@ export class AuthService {
       expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
     await this.verifyTokenRepository.save(verifyTokenEntity);
-    await this.mailService.sendVerifyMail(email, profileEntity.fullName, `${frontendUrl}/verify?token=${uuid}`, '24h');
+    await this.mailService.sendVerifyMail(
+      email,
+      profileEntity.fullName,
+      `${frontendUrl}/verify?token=${uuid}`,
+      '24h',
+    );
   }
 
   // step: send mail verify
@@ -278,6 +290,16 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
+    // check redis
+    const keyRedis = `verify-${email}-${user.id}`;
+    const getRedis = Number((await this.redisService.get(keyRedis)) || 0);
+    if (getRedis === 0) {
+      await this.redisService.incr(keyRedis, 15 * 60);
+    }
+    if (getRedis >= 3) {
+      throw new BadRequestException('Please try again later');
+    }
+    // check verify token
     const verifyToken = await this.verifyTokenRepository.findOneBy({
       userId: user.id,
     });
@@ -293,6 +315,70 @@ export class AuthService {
       expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
     await this.verifyTokenRepository.save(verifyTokenEntity);
-    await this.mailService.sendVerifyMail(email, user.profile.fullName, `${frontendUrl}/verify?token=${uuid}`, '24h');
+    await this.mailService.sendVerifyMail(
+      email,
+      user.profile.fullName,
+      `${frontendUrl}/verify?token=${uuid}`,
+      '24h',
+    );
+  }
+
+  // step: forgot password
+  async forgotPassword(body: VerifyDto) {
+    const email = body.email;
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
+    const uuid = randomBytes(32).toString('hex');
+    const hashedToken = createHash('sha256').update(uuid).digest('hex');
+    // step: check redis
+    const keyRedis = `forgot-password-${email}`;
+    const getRedis = Number((await this.redisService.get(keyRedis)) || 0);
+    if (getRedis === 0) {
+      await this.redisService.incr(keyRedis, 15 * 60);
+    } else {
+      await this.redisService.incr(keyRedis);
+    }
+    if (getRedis >= 3) {
+      throw new BadRequestException('Please try again later');
+    }
+    // step: check user exist
+    const user = await this.userRepository.findOne({
+      where: {
+        email,
+      },
+      relations: {
+        profile: true,
+      },
+    });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    // step: exisit verify email
+    if (!user.isVerified) {
+      throw new UnauthorizedException('User not verified');
+    }
+    // step: check reset password token
+    const resetPasswordToken =
+      await this.resetPasswordTokenRepository.findOneBy({
+        userId: user.id,
+      });
+    if (resetPasswordToken) {
+      await this.resetPasswordTokenRepository.delete({
+        userId: user.id,
+      });
+    }
+    // step: create reset password token
+    const resetPasswordTokenEntity = this.resetPasswordTokenRepository.create({
+      userId: user.id,
+      token: hashedToken,
+      isUsed: false,
+      expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    });
+    // await this.resetPasswordTokenRepository.save(resetPasswordTokenEntity);
+    // await this.mailService.sendForgotPasswordMail(
+    //   email,
+    //   user.profile.fullName,
+    //   `${frontendUrl}/forgot-password?token=${uuid}`,
+    //   '24h',
+    // );
   }
 }

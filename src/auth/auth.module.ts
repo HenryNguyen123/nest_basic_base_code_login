@@ -10,11 +10,23 @@ import { Role } from 'src/roles/entities/role.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { VerifyToken } from 'src/auth/entities/verify-token.entity';
 import { MailModule } from 'src/mails/mail.module';
+import { ResetPasswordToken } from 'src/auth/entities/reset-password-token.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, RefreshToken, Profile, Role, UserRole, VerifyToken]), MailModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      User,
+      RefreshToken,
+      Profile,
+      Role,
+      UserRole,
+      VerifyToken,
+      ResetPasswordToken,
+    ]),
+    MailModule,
+  ],
   controllers: [AuthController],
   providers: [AuthService, RedisService],
   exports: [AuthService],
 })
-export class AuthModule { }
+export class AuthModule {}

@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsDate,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class RegisterDto {
   @ApiProperty({
@@ -36,7 +44,7 @@ export class RegisterDto {
     required: false,
   })
   @IsOptional()
-  @Transform(({ value }) => value === '' ? undefined : value)
+  @Transform(({ value }) => (value === '' ? undefined : value))
   @IsString()
   @MinLength(3)
   @MaxLength(100)
@@ -47,7 +55,7 @@ export class RegisterDto {
     required: false,
   })
   @IsOptional()
-  @Transform(({ value }) => value === '' ? undefined : value)
+  @Transform(({ value }) => (value === '' ? undefined : value))
   @IsString()
   @MinLength(3)
   @MaxLength(100)
@@ -71,7 +79,7 @@ export class RegisterDto {
     required: false,
   })
   @IsOptional()
-  @Transform(({ value }) => value === '' ? undefined : value)
+  @Transform(({ value }) => (value === '' ? undefined : value))
   @IsString()
   @MinLength(10)
   @MaxLength(15)
