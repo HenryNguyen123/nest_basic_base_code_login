@@ -373,12 +373,12 @@ export class AuthService {
       isUsed: false,
       expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
-    // await this.resetPasswordTokenRepository.save(resetPasswordTokenEntity);
-    // await this.mailService.sendForgotPasswordMail(
-    //   email,
-    //   user.profile.fullName,
-    //   `${frontendUrl}/forgot-password?token=${uuid}`,
-    //   '24h',
-    // );
+    await this.resetPasswordTokenRepository.save(resetPasswordTokenEntity);
+    await this.mailService.sendForgotPasswordMail(
+      email,
+      user.profile.fullName,
+      `${frontendUrl}/forgot-password?token=${uuid}`,
+      '15 minutes',
+    );
   }
 }

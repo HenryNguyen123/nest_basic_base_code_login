@@ -23,4 +23,18 @@ export class MailService {
       year: new Date().getFullYear(),
     });
   }
+
+  //step: send forget password
+  async sendForgotPasswordMail(
+    to: string,
+    name: string,
+    resetLink: string,
+    resetTime: string,
+  ) {
+    await this.mailUtil.send(to, 'forget pasword', './forget-password', {
+      name,
+      resetLink,
+      resetTime,
+    });
+  }
 }
