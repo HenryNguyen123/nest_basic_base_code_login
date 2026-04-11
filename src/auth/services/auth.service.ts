@@ -243,11 +243,11 @@ export class AuthService {
     if (!role) {
       throw new InternalServerErrorException('Role not found');
     }
-    // create user rolecreate({
+    // create user role
+    const userRoleEntity = this.userRoleRepository.create({
       user: userEntity,
       role,
     });
-    const userRoleEntity = this.userRoleRepository.
     await this.userRoleRepository.save(userRoleEntity);
     // send verify mail
     const uuid = randomUUID();

@@ -7,13 +7,15 @@ import { Profile } from 'src/users/entities/profile.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { VerifyToken } from 'src/auth/entities/verify-token.entity';
+import { MailModule } from 'src/mails/mail.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Profile, Role, UserRole, VerifyToken]),
+    MailModule,
   ],
   controllers: [UserController],
   providers: [UserService],
-  exports: [],
+  exports: [UserService],
 })
 export class UserModule {}

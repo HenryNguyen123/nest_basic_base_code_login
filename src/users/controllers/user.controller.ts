@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   HttpCode,
   HttpStatus,
@@ -26,7 +27,7 @@ export class UserController {
   })
   @UseInterceptors(UploadFileInterceptor('avatar', './public/images/avatar'))
   async create(
-    @Res() createUserDto: CreateUserDto,
+    @Body() createUserDto: CreateUserDto,
     @UploadedFile() file: Express.Multer.File | null,
   ): Promise<void> {
     const path: string = '/images/avatar';
