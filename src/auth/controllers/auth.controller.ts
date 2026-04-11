@@ -78,6 +78,6 @@ export class AuthController {
   // step: reset password
   @Post('reset password')
   async resetPassword(@Body() body: string): Promise<void> {
-    await this.authService.resetPassword(body);
+    // await this.authService.resetPassword(body);
   }
 }

@@ -11,6 +11,7 @@ import { RedisModule } from './redis/redis.module';
 import { CategoryModule } from 'src/categories/category.module';
 import { PermissionModule } from 'src/permissions/permission.module';
 import { MailModule } from 'src/mails/mail.module';
+import { UserModule } from 'src/users/user.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -36,6 +37,7 @@ import { MailModule } from 'src/mails/mail.module';
     CategoryModule,
     PermissionModule,
     MailModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
