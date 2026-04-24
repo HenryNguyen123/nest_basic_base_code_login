@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { plainToInstance } from 'class-transformer';
 import { randomUUID } from 'crypto';
 import { VerifyToken } from 'src/auth/entities/verify-token.entity';
 import { hashPassword } from 'src/commons/utils/password.util';
@@ -14,8 +15,11 @@ import { Role } from 'src/roles/entities/role.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { RoleEnum } from 'src/roles/enums/role.enum';
 import { CreateUserDto } from 'src/users/dtos/request/create-user.dto';
+import { ReadUserResponseDto } from 'src/users/dtos/response/read-user.response.dto';
+import { UserResponseDto } from 'src/users/dtos/response/user.response.dto';
 import { Profile } from 'src/users/entities/profile.entity';
 import { User } from 'src/users/entities/user.entity';
+import { IUserPayload } from 'src/users/interfaces/user.interface';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -107,5 +111,100 @@ export class UserService {
       `${frontendUrl}/verify?token=${uuid}`,
       '24h',
     );
+  }
+  //update
+  //read
+  async read() {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .leftJoinAndSelect('user.userRoles', 'userRole')
+      .leftJoinAndSelect('userRole.role', 'role')
+      .select([
+        'user.id',
+        'user.userName',
+        'user.email',
+        'user.isActive',
+        'user.createdAt',
+
+        'profile.id',
+        'profile.fullName',
+        'profile.phone',
+        'profile.avatar',
+
+        'userRole.userId',
+        'userRole.roleId',
+
+        'role.id',
+        'role.name',
+        'role.code',
+      ])
+      .getMany();
+
+    //payload
+    const payload = user.map((u) => ({
+      userId: u.id,
+      userName: u.userName,
+      email: u.email,
+      isActive: u.isActive,
+      createdAt: u.createdAt,
+      profileId: u.profile.id,
+      fullName: u.profile.fullName,
+      phone: u.profile.phone,
+      avatar: u.profile.avatar,
+      roleId: u.userRoles.map((ur) => ur.role.id),
+      nameRole: u.userRoles.map((ur) => ur.role.name),
+      codeRole: u.userRoles.map((ur) => ur.role.code),
+    }));
+    return plainToInstance(ReadUserResponseDto, {
+      user: payload,
+    });
+  }
+  //find user by id
+  async findById(id: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: id },
+      relations: {
+        profile: true,
+      },
+    });
+    if (!user) throw new InternalServerErrorException('user not exist!');
+    const userID = user.id;
+    const userRole = await this.userRoleRepository.findOne({
+      where: { userId: userID },
+    });
+    const roleId = userRole?.roleId;
+    // const roles = await this.roleRepository.findOne({
+    //   where: { id: roleId },
+    // });
+    const roles = user.userRoles.map((userRole) => {
+      return {
+        name: userRole.role.name,
+        code: userRole.role.code,
+      };
+    });
+    // const roleCode = user.userRoles.map((userRole) => {
+    //   return userRole.role.code;
+    // });
+    // const permissionCodes = user.userRoles.flatMap((userRole) =>
+    //   userRole.role.rolePermissions.map((rp) => rp.permission.code),
+    // );
+    if (!roles) throw new InternalServerErrorException('role not exist!');
+    const payload: IUserPayload = {
+      email: user.email,
+      userName: user.userName,
+      isActive: user.isActive,
+      role: roles,
+      profile: {
+        fullName: user.profile.fullName,
+        gender: user.profile.gender,
+        dob: user.profile.dob,
+        phone: user.profile.phone,
+        avatar: user.profile.avatar,
+      },
+    };
+    return plainToInstance(UserResponseDto, {
+      user: payload,
+    });
   }
 }
