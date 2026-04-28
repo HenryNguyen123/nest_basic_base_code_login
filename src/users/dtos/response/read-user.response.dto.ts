@@ -37,6 +37,6 @@ export class ReadUserResponseDto {
   @Expose()
   nameRole: string | undefined;
 
-//   @Expose()
-//   codeRole: string | undefined;
+  @Expose()
+  codeRole: string | undefined;
 }

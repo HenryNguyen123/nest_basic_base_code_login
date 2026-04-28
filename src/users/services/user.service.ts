@@ -15,6 +15,7 @@ import { Role } from 'src/roles/entities/role.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { RoleEnum } from 'src/roles/enums/role.enum';
 import { CreateUserDto } from 'src/users/dtos/request/create-user.dto';
+import { UpdateNewUserResDto } from 'src/users/dtos/request/update-new-user.request.dto';
 import { ReadUserResponseDto } from 'src/users/dtos/response/read-user.response.dto';
 import { UserResponseDto } from 'src/users/dtos/response/user.response.dto';
 import { Profile } from 'src/users/entities/profile.entity';
@@ -113,6 +114,14 @@ export class UserService {
     );
   }
   //update
+  async update(body: UpdateNewUserResDto, file: Express.Multer.File | null) {
+    const email: string = body.email;
+    const user = await this.userRepository.findOne({
+      where: [{ email }, { email }],
+    });
+    if (!user) throw new ConflictException('User already exists');
+    
+  }
   //read
   async read() {
     const user = await this.userRepository

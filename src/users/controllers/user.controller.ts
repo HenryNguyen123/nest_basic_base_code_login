@@ -14,6 +14,7 @@ import {
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { UploadFileInterceptor } from 'src/commons/interceptors/upload-file.interceptor';
 import { CreateUserDto } from 'src/users/dtos/request/create-user.dto';
+import { UpdateNewUserResDto } from 'src/users/dtos/request/update-new-user.request.dto';
 import { ReadUserResponseDto } from 'src/users/dtos/response/read-user.response.dto';
 import { UserResponseDto } from 'src/users/dtos/response/user.response.dto';
 import { UserService } from 'src/users/services/user.service';
@@ -40,7 +41,17 @@ export class UserController {
   }
   //update
   @Patch('update')
-  async update() {}
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    type: CreateUserDto,
+  })
+  @UseInterceptors(UploadFileInterceptor('avatar', './public/images/avatar'))
+  async update(
+    @Body() updateUserDto: UpdateNewUserResDto,
+    @UploadedFile() file: Express.Multer.File | null,
+  ) {
+    return this.userService.update(updateUserDto, file);
+  }
   //read
   @Get('read')
   async read(): Promise<ReadUserResponseDto> {
