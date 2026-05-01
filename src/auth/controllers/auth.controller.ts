@@ -57,7 +57,7 @@ export class AuthController {
     @Body() registerDto: RegisterDto,
     @UploadedFile() file: Express.Multer.File | null,
   ): Promise<void> {
-    const path = '/images/avatar';
+    const path: string = '/images/avatar';
     await this.authService.register(registerDto, file, path);
   }
 

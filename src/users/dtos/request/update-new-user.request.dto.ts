@@ -11,6 +11,10 @@ import {
 } from 'class-validator';
 
 export class UpdateNewUserResDto {
+  @ApiProperty({
+    example: 'test1@gmail.com',
+    required: false,
+  })
   @IsString()
   @IsEmail()
   @IsNotEmpty()
@@ -62,4 +66,24 @@ export class UpdateNewUserResDto {
   @MinLength(10)
   @MaxLength(15)
   phone?: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+  })
+  @IsOptional()
+  avatar?: any;
+
+  // role
+  @ApiProperty({
+    example: 'USER',
+    required: false,
+  })
+  @IsOptional()
+  @Transform(({ value }) => (value === '' ? undefined : value))
+  @IsString()
+  @MinLength(3)
+  @MaxLength(100)
+  roleCode?: string;
 }

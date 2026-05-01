@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -114,13 +115,84 @@ export class UserService {
     );
   }
   //update
-  async update(body: UpdateNewUserResDto, file: Express.Multer.File | null) {
+  async update(
+    body: UpdateNewUserResDto,
+    file: Express.Multer.File | null,
+    path: string,
+  ) {
     const email: string = body.email;
-    const user = await this.userRepository.findOne({
+    const roleCode: string | null = body.roleCode ?? null;
+    const userCheck = await this.userRepository.findOne({
       where: [{ email }, { email }],
+      relations: {
+        profile: true,
+        userRoles: true,
+      },
     });
-    if (!user) throw new ConflictException('User already exists');
-    
+    if (!userCheck) throw new NotFoundException('User already exists');
+    //update profile
+    let pathAvatar: string | null = null;
+    if (file) {
+      pathAvatar = pathFileName(file, path);
+    }
+    const resultProfile = await this.profileRepository.update(userCheck.id, {
+      fullName: body.fullName ?? userCheck.profile.fullName,
+      gender: body.gender ?? userCheck.profile.gender,
+      dob: body.dob ?? userCheck.profile.dob,
+      phone: body.phone ?? userCheck.profile.phone,
+      avatar: pathAvatar ?? userCheck.profile.avatar,
+    });
+    if (!resultProfile.affected)
+      throw new NotFoundException('profile not found');
+    //update role
+    if (roleCode) {
+      const roleCheck = await this.roleRepository.findOne({
+        where: { code: roleCode },
+      });
+      if (!roleCheck) throw new NotFoundException('Role not found');
+      const roleUser = await this.userRoleRepository.findOne({
+        where: { userId: userCheck.id },
+        relations: { role: true },
+      });
+      if (!roleUser) throw new NotFoundException('UserRole not found');
+      await this.userRoleRepository.delete({ userId: userCheck.id });
+      const resultRoleUser = await this.userRoleRepository.save({
+        userId: userCheck.id,
+        roleId: roleCheck.id,
+      });
+      if (!resultRoleUser) throw new NotFoundException('UserRole not found');
+    }
+    const user = await this.userRepository.findOne({
+      where: { email: email },
+      relations: {
+        profile: true,
+        userRoles: {
+          role: true,
+        },
+      },
+    });
+    const roles =
+      user?.userRoles.map((ur) => ({
+        name: ur.role.name,
+        code: ur.role.code,
+      })) ?? [];
+    if (!user) throw new NotFoundException('user not found');
+    const payload: IUserPayload = {
+      email: user.email,
+      userName: user.userName,
+      isActive: user.isActive,
+      role: roles,
+      profile: {
+        fullName: user.profile.fullName,
+        gender: user.profile.gender,
+        dob: user.profile.dob,
+        phone: user.profile.phone,
+        avatar: user.profile.avatar,
+      },
+    };
+    return plainToInstance(UserResponseDto, {
+      user: payload,
+    });
   }
   //read
   async read() {
@@ -178,11 +250,11 @@ export class UserService {
       },
     });
     if (!user) throw new InternalServerErrorException('user not exist!');
-    const userID = user.id;
-    const userRole = await this.userRoleRepository.findOne({
-      where: { userId: userID },
-    });
-    const roleId = userRole?.roleId;
+    // const userID = user.id;
+    // const userRole = await this.userRoleRepository.findOne({
+    //   where: { userId: userID },
+    // });
+    // const roleId = userRole?.roleId;
     // const roles = await this.roleRepository.findOne({
     //   where: { id: roleId },
     // });

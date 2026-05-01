@@ -43,14 +43,15 @@ export class UserController {
   @Patch('update')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    type: CreateUserDto,
+    type: UpdateNewUserResDto,
   })
   @UseInterceptors(UploadFileInterceptor('avatar', './public/images/avatar'))
   async update(
     @Body() updateUserDto: UpdateNewUserResDto,
     @UploadedFile() file: Express.Multer.File | null,
-  ) {
-    return this.userService.update(updateUserDto, file);
+  ): Promise<UserResponseDto> {
+    const path: string = '/images/avatar';
+    return this.userService.update(updateUserDto, file, path);
   }
   //read
   @Get('read')
