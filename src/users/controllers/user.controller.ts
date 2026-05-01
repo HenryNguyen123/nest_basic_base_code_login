@@ -15,6 +15,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { UploadFileInterceptor } from 'src/commons/interceptors/upload-file.interceptor';
 import { CreateUserDto } from 'src/users/dtos/request/create-user.dto';
 import { UpdateNewUserResDto } from 'src/users/dtos/request/update-new-user.request.dto';
+import { UpdateStatusUserDto } from 'src/users/dtos/request/update-status.request.dto';
 import { ReadUserResponseDto } from 'src/users/dtos/response/read-user.response.dto';
 import { UserResponseDto } from 'src/users/dtos/response/user.response.dto';
 import { UserService } from 'src/users/services/user.service';
@@ -64,5 +65,16 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<UserResponseDto> {
     return await this.userService.findById(id);
+  }
+  //update status user
+  @Patch('update/:id/status')
+  @ApiBody({
+    type: UpdateStatusUserDto,
+  })
+  async updateStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateStatusUserDto,
+  ): Promise<UserResponseDto> {
+    return await this.userService.updateStatus(body, id);
   }
 }

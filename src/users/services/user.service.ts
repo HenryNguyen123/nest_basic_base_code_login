@@ -17,6 +17,7 @@ import { UserRole } from 'src/roles/entities/user-role.entity';
 import { RoleEnum } from 'src/roles/enums/role.enum';
 import { CreateUserDto } from 'src/users/dtos/request/create-user.dto';
 import { UpdateNewUserResDto } from 'src/users/dtos/request/update-new-user.request.dto';
+import { UpdateStatusUserDto } from 'src/users/dtos/request/update-status.request.dto';
 import { ReadUserResponseDto } from 'src/users/dtos/response/read-user.response.dto';
 import { UserResponseDto } from 'src/users/dtos/response/user.response.dto';
 import { Profile } from 'src/users/entities/profile.entity';
@@ -271,6 +272,48 @@ export class UserService {
     //   userRole.role.rolePermissions.map((rp) => rp.permission.code),
     // );
     if (!roles) throw new InternalServerErrorException('role not exist!');
+    const payload: IUserPayload = {
+      email: user.email,
+      userName: user.userName,
+      isActive: user.isActive,
+      role: roles,
+      profile: {
+        fullName: user.profile.fullName,
+        gender: user.profile.gender,
+        dob: user.profile.dob,
+        phone: user.profile.phone,
+        avatar: user.profile.avatar,
+      },
+    };
+    return plainToInstance(UserResponseDto, {
+      user: payload,
+    });
+  }
+  //update status user
+  async updateStatus(body: UpdateStatusUserDto, id: number) {
+    const userCheck = await this.userRepository.findOne({
+      where: { id },
+    });
+    if (!userCheck) throw new InternalServerErrorException('user not exist!');
+    const result = await this.userRepository.update(id, {
+      isActive: body.isActive,
+    });
+    if (!result) throw new InternalServerErrorException('user not exist!');
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: {
+        profile: true,
+        userRoles: {
+          role: true,
+        },
+      },
+    });
+    if (!user) throw new InternalServerErrorException('user not exist!');
+    const roles =
+      user?.userRoles.map((ur) => ({
+        name: ur.role.name,
+        code: ur.role.code,
+      })) ?? [];
     const payload: IUserPayload = {
       email: user.email,
       userName: user.userName,
