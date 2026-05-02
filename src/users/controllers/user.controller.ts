@@ -9,9 +9,12 @@ import {
   Patch,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RoleAdminGuard } from 'src/auth/guards/role-admin.guard';
 import { UploadFileInterceptor } from 'src/commons/interceptors/upload-file.interceptor';
 import { CreateUserDto } from 'src/users/dtos/request/create-user.dto';
 import { UpdateNewUserResDto } from 'src/users/dtos/request/update-new-user.request.dto';
@@ -27,6 +30,7 @@ export class UserController {
   constructor(private userService: UserService) {}
   //create
   @Post('create')
+  @UseGuards(JwtAuthGuard, RoleAdminGuard)
   @HttpCode(HttpStatus.CREATED)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
