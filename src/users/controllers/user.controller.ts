@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -17,6 +18,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RoleAdminGuard } from 'src/auth/guards/role-admin.guard';
 import { UploadFileInterceptor } from 'src/commons/interceptors/upload-file.interceptor';
 import { CreateUserDto } from 'src/users/dtos/request/create-user.dto';
+import { DeleteUserDto } from 'src/users/dtos/request/delete-user.request.dto';
 import { UpdateNewUserResDto } from 'src/users/dtos/request/update-new-user.request.dto';
 import { UpdateStatusUserDto } from 'src/users/dtos/request/update-status.request.dto';
 import { ReadUserResponseDto } from 'src/users/dtos/response/read-user.response.dto';
@@ -80,5 +82,15 @@ export class UserController {
     @Body() body: UpdateStatusUserDto,
   ): Promise<UserResponseDto> {
     return await this.userService.updateStatus(body, id);
+  }
+  //delete user
+  @Delete('delete')
+  @UseGuards(JwtAuthGuard, RoleAdminGuard)
+  @HttpCode(204)
+  @ApiBody({
+    type: DeleteUserDto,
+  })
+  async delete(@Body() body: DeleteUserDto) {
+    await this.userService.delete(body);
   }
 }

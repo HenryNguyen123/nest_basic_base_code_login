@@ -16,6 +16,7 @@ import { Role } from 'src/roles/entities/role.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { RoleEnum } from 'src/roles/enums/role.enum';
 import { CreateUserDto } from 'src/users/dtos/request/create-user.dto';
+import { DeleteUserDto } from 'src/users/dtos/request/delete-user.request.dto';
 import { UpdateNewUserResDto } from 'src/users/dtos/request/update-new-user.request.dto';
 import { UpdateStatusUserDto } from 'src/users/dtos/request/update-status.request.dto';
 import { ReadUserResponseDto } from 'src/users/dtos/response/read-user.response.dto';
@@ -330,5 +331,17 @@ export class UserService {
     return plainToInstance(UserResponseDto, {
       user: payload,
     });
+  }
+  //delete user
+  async delete(body: DeleteUserDto) {
+    const userId: number = body.id;
+    // const user = await this.userRepository.findOne({
+    //   where: { id: body.id },
+    // });
+    // if (!user) throw new InternalServerErrorException('user not exist!');
+    // await this.userRepository.delete(body.id);
+    const resultRoleUser = await this.userRepository.delete(userId);
+    if (resultRoleUser.affected === 0)
+      throw new NotFoundException('User not found');
   }
 }
