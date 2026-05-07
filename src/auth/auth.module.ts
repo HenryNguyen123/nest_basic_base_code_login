@@ -11,6 +11,7 @@ import { UserRole } from 'src/roles/entities/user-role.entity';
 import { VerifyToken } from 'src/auth/entities/verify-token.entity';
 import { MailModule } from 'src/mails/mail.module';
 import { ResetPasswordToken } from 'src/auth/entities/reset-password-token.entity';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -23,10 +24,14 @@ import { ResetPasswordToken } from 'src/auth/entities/reset-password-token.entit
       VerifyToken,
       ResetPasswordToken,
     ]),
+    JwtModule.register({
+      secret: process.env.JWT_ACCESS_TOKEN_SECRET_KEY,
+      signOptions: { expiresIn: '1d' },
+    }),
     MailModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, RedisService],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule],
+  providers: [AuthService, RedisService, JwtService],
 })
 export class AuthModule {}

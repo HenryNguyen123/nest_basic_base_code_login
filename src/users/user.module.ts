@@ -8,10 +8,12 @@ import { Role } from 'src/roles/entities/role.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { VerifyToken } from 'src/auth/entities/verify-token.entity';
 import { MailModule } from 'src/mails/mail.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Profile, Role, UserRole, VerifyToken]),
+    AuthModule,
     MailModule,
   ],
   controllers: [UserController],
