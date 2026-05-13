@@ -27,7 +27,7 @@ import { UserService } from 'src/users/services/user.service';
 
 @ApiTags('user')
 @ApiBearerAuth()
-@Controller()
+@Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
   //create
