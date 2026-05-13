@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
+import { RoleCode } from 'src/auth/enums/role-code.enum';
 import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
+import { RoleCreateRequest } from 'src/roles/dtos/request/role-create.request.dto';
 import { RoleReadResponse } from 'src/roles/dtos/response/role-read.response.dto';
 import { Role } from 'src/roles/entities/role.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
@@ -16,8 +18,32 @@ export class RoleService {
     private readonly userRoleRepository: Repository<UserRole>,
   ) {}
   //create role
-  async create(jwt: IJwtPayload) {
-    console.log('jwt', jwt);
+  async create(jwt: IJwtPayload, body: RoleCreateRequest) {
+    const roleCode = body.code.toUpperCase();
+    const adminSub = jwt.sub;
+    const valisRole = [RoleCode.ADMIN, RoleCode.SUPERADMIN];
+    if (!adminSub) throw new UnauthorizedException('no authentication');
+    const admin = await this.userRoleRepository.findOne({
+      where: { userId: adminSub },
+      relations: {
+        role: true,
+      },
+    });
+    if (!admin) throw new UnauthorizedException('User not found');
+    if (!valisRole.includes(admin.role.code as RoleCode))
+      throw new UnauthorizedException('User not role');
+    // check role exists
+    const roleCheck = await this.roleRepository.findOne({
+      where: { code: roleCode },
+    });
+    if (roleCheck) throw new UnauthorizedException('Role exist');
+    const roleEntity = this.roleRepository.create({
+      name: body.name,
+      code: roleCode,
+      description: body.descsription,
+      created_at: Date(),
+    });
+    await this.roleRepository.save(roleEntity);
   }
   //read roleas
   async read() {
