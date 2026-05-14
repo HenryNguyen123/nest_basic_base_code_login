@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -38,4 +40,14 @@ export class RoleController {
   async read(): Promise<RoleReadResponse> {
     return await this.roleService.read();
   }
+  //update role by admin
+  @Patch('update')
+  @UseGuards(JwtAuthGuard, RoleAdminGuard)
+  async update() {
+    return await this.roleService.update();
+  }
+  //delete role by admin
+  @Delete('destroy')
+  @UseGuards(JwtAuthGuard, RoleAdminGuard)
+  async destroy() {}
 }

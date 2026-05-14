@@ -69,4 +69,6 @@ export class RoleService {
     }));
     return plainToInstance(RoleReadResponse, { payload });
   }
+  // update role by admin
+  async update() {}
 }
