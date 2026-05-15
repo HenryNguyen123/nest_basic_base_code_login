@@ -3,6 +3,15 @@ import { IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UpdateRoleRequest {
   @ApiProperty({
+    example: 'USER_OLD',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  codeOld?: string;
+
+  @ApiProperty({
     example: 'user',
     required: false,
   })

@@ -1,10 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { RoleCode } from 'src/auth/enums/role-code.enum';
 import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
 import { RoleCreateRequest } from 'src/roles/dtos/request/role-create.request.dto';
+import { UpdateRoleRequest } from 'src/roles/dtos/request/role-update.request.dto';
 import { RoleReadResponse } from 'src/roles/dtos/response/role-read.response.dto';
+import { RoleResponseDto } from 'src/roles/dtos/response/role.response.dto';
 import { Role } from 'src/roles/entities/role.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { Repository } from 'typeorm';
@@ -70,5 +76,28 @@ export class RoleService {
     return plainToInstance(RoleReadResponse, { payload });
   }
   // update role by admin
-  async update() {}
+  async update(body: UpdateRoleRequest) {
+    const { codeOld, name, code, description } = body;
+    if (!codeOld) throw new UnauthorizedException('code old do not exist');
+    const roleCheck = await this.roleRepository.findOne({
+      where: { code: codeOld },
+    });
+    if (!roleCheck) throw new UnauthorizedException('User exist');
+    const role = await this.roleRepository.update(roleCheck.id, {
+      name: name ?? roleCheck.name,
+      code: code ?? roleCheck.code,
+      description: description ?? roleCheck.description,
+    });
+    if (!role.affected) throw new NotFoundException('role not found');
+    const roleRes = await this.roleRepository.findOne({
+      where: { code: code ?? codeOld },
+    });
+    if (!roleRes) throw new UnauthorizedException('role result don not exist');
+    const payload: RoleResponseDto = {
+      name: roleRes.name,
+      code: roleRes.code,
+      description: roleRes.description,
+    };
+    return plainToInstance(RoleResponseDto, { payload });
+  }
 }
