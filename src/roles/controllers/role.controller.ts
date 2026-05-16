@@ -15,6 +15,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RoleAdminGuard } from 'src/auth/guards/role-admin.guard';
 import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
 import { RoleCreateRequest } from 'src/roles/dtos/request/role-create.request.dto';
+import { RoleDeleteRequestDto } from 'src/roles/dtos/request/role-delete.request.dto';
 import { UpdateRoleRequest } from 'src/roles/dtos/request/role-update.request.dto';
 import { RoleReadResponse } from 'src/roles/dtos/response/role-read.response.dto';
 import { RoleResponseDto } from 'src/roles/dtos/response/role.response.dto';
@@ -54,5 +55,11 @@ export class RoleController {
   //delete role by admin
   @Delete('destroy')
   @UseGuards(JwtAuthGuard, RoleAdminGuard)
-  async destroy() {}
+  @HttpCode(204)
+  @ApiBody({
+    type: RoleDeleteRequestDto,
+  })
+  async destroy(@Body() body: RoleDeleteRequestDto) {
+    await this.roleService.destroy(body);
+  }
 }
