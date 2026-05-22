@@ -112,4 +112,17 @@ export class RoleService {
     const res = await this.roleRepository.delete(checkRole.id);
     if (res.affected === 0) throw new NotFoundException('role not found');
   }
+  // find role by id with admin role
+  async findbyId(id: number) {
+    const result = await this.roleRepository.findOne({
+      where: { id: id },
+      relations: {
+        userRoles: {
+          user: true,
+        },
+      },
+    });
+    if (!result) throw new NotFoundException('role not found');
+    return result;
+  }
 }

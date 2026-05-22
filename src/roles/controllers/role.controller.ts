@@ -5,6 +5,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseIntPipe,
   Patch,
   Post,
   Req,
@@ -61,5 +63,11 @@ export class RoleController {
   })
   async destroy(@Body() body: RoleDeleteRequestDto) {
     await this.roleService.destroy(body);
+  }
+  // find role by id
+  @Get(':id')
+  @UseGuards(JwtAuthGuard, RoleAdminGuard)
+  async findbyId(@Param('id', ParseIntPipe) id: number) {
+    return await this.roleService.findbyId(id);
   }
 }
