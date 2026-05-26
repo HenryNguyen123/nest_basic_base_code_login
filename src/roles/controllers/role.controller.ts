@@ -19,6 +19,7 @@ import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
 import { RoleCreateRequest } from 'src/roles/dtos/request/role-create.request.dto';
 import { RoleDeleteRequestDto } from 'src/roles/dtos/request/role-delete.request.dto';
 import { UpdateRoleRequest } from 'src/roles/dtos/request/role-update.request.dto';
+import { RoleFindByIdReponse } from 'src/roles/dtos/response/role-find-by-id.resquest.dto';
 import { RoleReadResponse } from 'src/roles/dtos/response/role-read.response.dto';
 import { RoleResponseDto } from 'src/roles/dtos/response/role.response.dto';
 import { RoleService } from 'src/roles/services/role.service';
@@ -67,7 +68,9 @@ export class RoleController {
   // find role by id
   @Get(':id')
   @UseGuards(JwtAuthGuard, RoleAdminGuard)
-  async findbyId(@Param('id', ParseIntPipe) id: number) {
+  async findbyId(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<RoleFindByIdReponse> {
     return await this.roleService.findbyId(id);
   }
 }

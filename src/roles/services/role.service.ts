@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
+// import { format } from 'path';
 import { RoleCode } from 'src/auth/enums/role-code.enum';
 import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
 import { RoleCreateRequest } from 'src/roles/dtos/request/role-create.request.dto';
@@ -15,6 +16,8 @@ import { RoleResponseDto } from 'src/roles/dtos/response/role.response.dto';
 import { Role } from 'src/roles/entities/role.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { Repository } from 'typeorm';
+import { format } from 'date-fns';
+import { RoleFindByIdReponse } from 'src/roles/dtos/response/role-find-by-id.resquest.dto';
 
 @Injectable()
 export class RoleService {
@@ -118,11 +121,27 @@ export class RoleService {
       where: { id: id },
       relations: {
         userRoles: {
-          user: true,
+          user: {
+            profile: true,
+          },
         },
       },
     });
     if (!result) throw new NotFoundException('role not found');
-    return result;
+    const payload: RoleFindByIdReponse = {
+      id: result.id,
+      name: result.name,
+      code: result.code,
+      description: result.description,
+      created_at: result.created_at
+        ? format(result.created_at, 'yyyy-MM-dd HH:mm:ss')
+        : '',
+      userRoles: result?.userRoles.map((ur) => ({
+        fullname: ur.user?.profile?.fullName ?? null,
+        gender: ur.user?.profile?.gender ?? null,
+        avatar: ur.user?.profile?.avatar ?? null,
+      })),
+    };
+    return plainToInstance(RoleFindByIdReponse, { payload });
   }
 }
