@@ -73,4 +73,12 @@ export class RoleController {
   ): Promise<RoleFindByIdReponse> {
     return await this.roleService.findbyId(id);
   }
+  /////////////////////////////////
+  // USER ROLE
+  ////////////////////////////////
+  //crate user-role by admin
+  @Post('user-role/create')
+  async userRoleCreate() {
+    return await this.roleService.userRoleCreate();
+  }
 }

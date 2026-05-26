@@ -144,4 +144,9 @@ export class RoleService {
     };
     return plainToInstance(RoleFindByIdReponse, { payload });
   }
+  /////////////////////////////////
+  // USER ROLE
+  ////////////////////////////////
+  //crate user-role by admin
+  async userRoleCreate() {}
 }
