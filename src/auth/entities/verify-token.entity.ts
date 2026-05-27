@@ -17,33 +17,33 @@ import {
 @Entity('verify_tokens')
 export class VerifyToken {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @Column({ unique: true })
   @IsNotEmpty()
   @MinLength(10)
   @IsString()
-  token: string;
+  token?: string;
 
   @Column({ name: 'user_id' })
   @IsNotEmpty()
   @IsNumber()
-  userId: number;
+  userId?: number;
 
   @Column({ name: 'expired_at' })
   @IsNotEmpty()
   @IsDate()
-  expiredAt: Date;
+  expiredAt?: Date;
 
   @Column({ default: false, name: 'is_used' })
-  isUsed: boolean;
+  isUsed?: boolean;
 
   @Column({ name: 'created_at' })
   @IsNotEmpty()
   @IsDate()
-  createdAt: Date;
+  createdAt?: Date;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user?: User;
 }
