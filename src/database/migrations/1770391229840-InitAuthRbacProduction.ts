@@ -166,6 +166,192 @@ export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
       )
     `);
 
+    ///////////////////////////////////////////
+    /// categories and products
+    //////////////////////////
+    //CATEGORY
+    await queryRunner.query(`
+      CREATE TABLE categories (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        slug VARCHAR(255) UNIQUE NOT NULL,  
+        description TEXT,
+        image VARCHAR(255),
+        parent_id BIGINT NULL,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_by BIGINT,
+        updated_by BIGINT,
+  
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_category_parent
+          FOREIGN KEY (parent_id)
+          REFERENCES categories(id)
+          ON DELETE SET NULL,
+        CONSTRAINT fk_category_created_by
+          FOREIGN KEY (created_by)
+          REFERENCES users(id)
+          ON DELETE SET NULL,
+        CONSTRAINT fk_category_updated_by
+          FOREIGN KEY (updated_by)
+          REFERENCES users(id)
+          ON DELETE SET NULL
+      );
+    `);
+
+    //COLORS
+    await queryRunner.query(`
+      CREATE TABLE colors (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        code VARCHAR(50) UNIQUE NOT NULL,
+        hex_code VARCHAR(20),
+
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );  
+    `);
+
+    //sizes
+    await queryRunner.query(`
+      CREATE TABLE sizes (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(50) NOT NULL,
+          code VARCHAR(50) UNIQUE NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    //PRODUCTS
+    await queryRunner.query(`
+      CREATE TABLE products (
+        id SERIAL PRIMARY KEY,
+        category_id BIGINT,
+        name VARCHAR(255) NOT NULL,
+        slug VARCHAR(255) UNIQUE NOT NULL,
+        sku VARCHAR(100) UNIQUE,
+        short_description TEXT,
+        description TEXT,
+        thumbnail VARCHAR(255),
+        price DECIMAL(12,2) NOT NULL,
+        sale_price DECIMAL(12,2),
+        stock INT DEFAULT 0,
+        is_active BOOLEAN DEFAULT TRUE,
+        is_featured BOOLEAN DEFAULT FALSE,
+        created_by BIGINT,
+        updated_by BIGINT,
+
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_product_category
+          FOREIGN KEY (category_id)
+          REFERENCES categories(id)
+          ON DELETE SET NULL,
+        CONSTRAINT fk_product_created_by
+          FOREIGN KEY (created_by)
+          REFERENCES users(id)
+          ON DELETE SET NULL,
+        CONSTRAINT fk_product_updated_by
+          FOREIGN KEY (updated_by)
+          REFERENCES users(id)
+          ON DELETE SET NULL
+      );  
+    `);
+
+    //PRODUCT IMAGES
+    await queryRunner.query(`
+      CREATE TABLE product_images (
+        id SERIAL PRIMARY KEY,
+        product_id BIGINT NOT NULL,
+        image_url VARCHAR(255) NOT NULL,
+        is_thumbnail BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+        CONSTRAINT fk_pi_product
+          FOREIGN KEY (product_id)
+          REFERENCES products(id)
+          ON DELETE CASCADE
+      );  
+    `);
+
+    //PRODUCT VARIANTS
+    await queryRunner.query(`
+      CREATE TABLE product_variants (
+        id SERIAL PRIMARY KEY,
+        product_id BIGINT NOT NULL,
+        color_id BIGINT,
+        size_id BIGINT,
+        sku VARCHAR(100) UNIQUE,
+        price DECIMAL(12,2),
+        sale_price DECIMAL(12,2),
+        stock INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+        CONSTRAINT fk_variant_product
+          FOREIGN KEY (product_id)
+          REFERENCES products(id)
+          ON DELETE CASCADE,
+        CONSTRAINT fk_variant_color
+          FOREIGN KEY (color_id)
+          REFERENCES colors(id)
+          ON DELETE SET NULL,
+        CONSTRAINT fk_variant_size
+          FOREIGN KEY (size_id)
+          REFERENCES sizes(id)
+          ON DELETE SET NULL
+      );
+    `);
+
+    //TAGS
+    await queryRunner.query(`
+      CREATE TABLE tags (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) UNIQUE NOT NULL,
+        slug VARCHAR(100) UNIQUE NOT NULL
+      );
+    `);
+
+    //PRODUCT TAGS
+    await queryRunner.query(`
+      CREATE TABLE product_tags (
+        product_id BIGINT NOT NULL,
+        tag_id BIGINT NOT NULL,
+        PRIMARY KEY(product_id, tag_id),
+
+        CONSTRAINT fk_pt_product
+          FOREIGN KEY(product_id)
+          REFERENCES products(id)
+          ON DELETE CASCADE,
+        CONSTRAINT fk_pt_tag
+          FOREIGN KEY(tag_id)
+          REFERENCES tags(id)
+          ON DELETE CASCADE
+      );
+    `);
+
+    // /INVENTORY LOGS
+    await queryRunner.query(`
+      CREATE TABLE inventory_logs (
+        id SERIAL PRIMARY KEY,
+        product_variant_id BIGINT NOT NULL,
+        type VARCHAR(50) NOT NULL,
+        quantity INT NOT NULL,
+        note TEXT,
+        created_by BIGINT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+        CONSTRAINT fk_il_variant
+          FOREIGN KEY(product_variant_id)
+          REFERENCES product_variants(id)
+          ON DELETE CASCADE,
+        CONSTRAINT fk_il_created_by
+          FOREIGN KEY(created_by)
+          REFERENCES users(id)
+          ON DELETE SET NULL
+      );
+    `);
+
+    /////////////////////
+
     // INDEXES
     await queryRunner.query(`CREATE INDEX idx_users_email ON users(email)`);
     await queryRunner.query(
