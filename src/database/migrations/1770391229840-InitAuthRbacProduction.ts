@@ -181,9 +181,9 @@ export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
         is_active BOOLEAN DEFAULT TRUE,
         created_by BIGINT,
         updated_by BIGINT,
-  
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
         CONSTRAINT fk_category_parent
           FOREIGN KEY (parent_id)
           REFERENCES categories(id)
