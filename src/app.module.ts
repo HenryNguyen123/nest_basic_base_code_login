@@ -40,6 +40,7 @@ import { RoleModule } from 'src/roles/role.module';
     MailModule,
     UserModule,
     RoleModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

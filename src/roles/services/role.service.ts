@@ -73,9 +73,9 @@ export class RoleService {
       username: item.user.userName,
       email: item.user.email,
       isActive: item.user.isActive,
-      fullName: item.user.profile.fullName,
-      gender: item.user.profile.gender,
-      avatar: item.user.profile.avatar,
+      fullName: item.user.profile?.fullName,
+      gender: item.user.profile?.gender,
+      avatar: item.user.profile?.avatar,
     }));
     return plainToInstance(RoleReadResponse, { payload });
   }

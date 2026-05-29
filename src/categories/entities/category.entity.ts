@@ -1,11 +1,3 @@
-import {
-  IsBoolean,
-  IsDate,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  MinLength,
-} from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -19,43 +11,31 @@ import {
 @Entity('categories')
 export class Category {
   @PrimaryGeneratedColumn()
-  id?: number;
-
-  @Column({ unique: false })
-  @IsNotEmpty()
-  @MinLength(2)
-  @IsString()
-  name?: string;
+  id!: number;
 
   @Column({ unique: true })
-  @IsNotEmpty()
-  @MinLength(2)
-  @IsString()
-  slug?: string;
+  name!: string;
+
+  @Column({ unique: true })
+  slug!: string;
 
   @Column({ nullable: true })
-  @IsString()
-  descsiptrion?: string;
+  description?: string;
 
   @Column({ nullable: true })
-  @IsString()
   image?: string;
 
-  @Column({ nullable: true, type: 'bigint' })
-  @IsNumber()
-  parent_id?: string;
+  @Column({ nullable: true, name: 'parent_id', type: 'bigint' })
+  parentId?: number;
 
-  @Column({ nullable: true, name: 'is_active', default: true })
-  @IsBoolean()
-  isActive?: string;
+  @Column({ name: 'is_active', default: true })
+  isActive!: boolean;
 
   @Column({ nullable: true, type: 'bigint', name: 'created_by' })
-  @IsNumber()
-  createdBy?: string;
+  createdBy?: number;
 
   @Column({ nullable: true, type: 'bigint', name: 'updated_by' })
-  @IsNumber()
-  updatedBy?: string;
+  updatedBy?: number;
 
   @Column({
     nullable: true,
@@ -63,7 +43,6 @@ export class Category {
     type: 'timestamp',
     default: 'CURRENT_TIMESTAMP',
   })
-  @IsDate()
   createdAt?: Date;
 
   @Column({
@@ -72,7 +51,6 @@ export class Category {
     type: 'timestamp',
     default: 'CURRENT_TIMESTAMP',
   })
-  @IsDate()
   updatedAt?: Date;
 
   //SELF RELATION

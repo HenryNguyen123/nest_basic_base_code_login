@@ -25,31 +25,31 @@ import {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id?: number;
+  id: number;
 
   @Column({ name: 'user_name', unique: true })
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
   @MaxLength(20)
-  userName?: string;
+  userName: string;
 
   @Column({ unique: true })
   @IsEmail()
   @IsNotEmpty()
   @MinLength(8)
   @MaxLength(150)
-  email?: string;
+  email: string;
 
   @Column({ select: false })
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
-  password?: string;
+  password: string;
 
   @Column({ name: 'is_active' })
   @IsBoolean()
-  isActive?: boolean;
+  isActive: boolean;
 
   @Column({ name: 'is_verified' })
   @IsBoolean()
@@ -76,10 +76,10 @@ export class User {
   updatedAt?: Date;
 
   @OneToOne(() => Profile, (profile) => profile.user)
-  profile?: Profile;
+  profile: Profile;
 
   @OneToMany(() => UserRole, (userRole) => userRole.user)
-  userRoles?: UserRole[];
+  userRoles: UserRole[];
 
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
   refreshTokens?: RefreshToken[];

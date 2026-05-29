@@ -1,4 +1,11 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Post,
+  UseGuards,
+  Delete,
+} from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Permissions } from 'src/permissions/decorators/permission.decorator';
 import { PermissionEnum } from 'src/permissions/enums/permission-enums.enum';
@@ -22,4 +29,16 @@ export class CategoryController {
   test() {
     return 'test';
   }
+  //create category
+  @Post('create')
+  async create() {}
+  //read category
+  @Get('read')
+  async read() {}
+  //update category
+  @Patch('update')
+  async update() {}
+  //delete category
+  @Delete('delete')
+  async destroy() {}
 }

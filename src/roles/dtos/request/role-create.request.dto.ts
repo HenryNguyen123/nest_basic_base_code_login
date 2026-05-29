@@ -9,7 +9,7 @@ export class RoleCreateRequest {
   @IsNotEmpty()
   @IsString()
   @MinLength(2)
-  name: string;
+  name!: string;
 
   @ApiProperty({
     example: 'USER',
@@ -18,7 +18,7 @@ export class RoleCreateRequest {
   @IsNotEmpty()
   @IsString()
   @MinLength(2)
-  code: string;
+  code!: string;
 
   @ApiProperty({
     example: 'this is user',
