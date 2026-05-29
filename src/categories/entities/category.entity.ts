@@ -6,7 +6,15 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('categories')
 export class Category {
@@ -25,35 +33,71 @@ export class Category {
   @IsString()
   slug?: string;
 
-  @Column({ unique: false })
+  @Column({ nullable: true })
   @IsString()
   descsiptrion?: string;
 
-  @Column({ unique: false })
+  @Column({ nullable: true })
   @IsString()
   image?: string;
 
-  @Column({ unique: false })
+  @Column({ nullable: true, type: 'bigint' })
   @IsNumber()
   parent_id?: string;
 
-  @Column({ unique: false, name: 'is_active', default: true })
+  @Column({ nullable: true, name: 'is_active', default: true })
   @IsBoolean()
   isActive?: string;
 
-  @Column({ unique: false, name: 'created_by' })
+  @Column({ nullable: true, type: 'bigint', name: 'created_by' })
   @IsNumber()
   createdBy?: string;
 
-  @Column({ unique: false, name: 'updated_by' })
+  @Column({ nullable: true, type: 'bigint', name: 'updated_by' })
   @IsNumber()
   updatedBy?: string;
 
-  @Column({ unique: false, name: 'created_at' })
+  @Column({
+    nullable: true,
+    name: 'created_at',
+    type: 'timestamp',
+    default: 'CURRENT_TIMESTAMP',
+  })
   @IsDate()
-  createdAt?: string;
+  createdAt?: Date;
 
-  @Column({ unique: false, name: 'updated_at' })
+  @Column({
+    nullable: true,
+    name: 'updated_at',
+    type: 'timestamp',
+    default: 'CURRENT_TIMESTAMP',
+  })
   @IsDate()
-  updatedAt?: string;
+  updatedAt?: Date;
+
+  //SELF RELATION
+  @ManyToOne(() => Category, (category) => category.children, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'parent_id' })
+  parent?: Category;
+
+  @OneToMany(() => Category, (category) => category.parent)
+  children?: Category[];
+
+  // USER RELATION
+  @ManyToOne(() => User, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'created_by' })
+  createdUser?: User;
+
+  @ManyToOne(() => User, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'updated_by' })
+  updatedUser?: User;
 }

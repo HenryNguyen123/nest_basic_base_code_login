@@ -11,14 +11,12 @@ import {
 import { AuditLog } from 'src/audits/entities/audit-log.entity';
 import { RefreshToken } from 'src/auth/entities/refresh-token.entity';
 import { ResetPasswordToken } from 'src/auth/entities/reset-password-token.entity';
-import { Role } from 'src/roles/entities/role.entity';
+import { Category } from 'src/categories/entities/category.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { Profile } from 'src/users/entities/profile.entity';
-import { Transform } from 'stream';
 import {
   Column,
   Entity,
-  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -27,43 +25,43 @@ import {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @Column({ name: 'user_name', unique: true })
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
   @MaxLength(20)
-  userName: string;
+  userName?: string;
 
   @Column({ unique: true })
   @IsEmail()
   @IsNotEmpty()
   @MinLength(8)
   @MaxLength(150)
-  email: string;
+  email?: string;
 
   @Column({ select: false })
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
-  password: string;
+  password?: string;
 
   @Column({ name: 'is_active' })
   @IsBoolean()
-  isActive: boolean;
+  isActive?: boolean;
 
   @Column({ name: 'is_verified' })
   @IsBoolean()
-  isVerified: boolean;
+  isVerified?: boolean;
 
   @Column({ name: 'failed_login_attempts' })
   @IsNumber()
-  failedLoginAttempts: number;
+  failedLoginAttempts?: number;
 
   @Column({ name: 'locked_until' })
   @IsDate()
-  lockedUntil: Date;
+  lockedUntil?: Date;
 
   @Column({ name: 'last_login_at' })
   @IsDate()
@@ -71,24 +69,31 @@ export class User {
 
   @Column({ name: 'created_at' })
   @IsDate()
-  createdAt: Date;
+  createdAt?: Date;
 
   @Column({ name: 'updated_at' })
   @IsDate()
-  updatedAt: Date;
+  updatedAt?: Date;
 
   @OneToOne(() => Profile, (profile) => profile.user)
-  profile: Profile;
+  profile?: Profile;
 
   @OneToMany(() => UserRole, (userRole) => userRole.user)
-  userRoles: UserRole[];
+  userRoles?: UserRole[];
 
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
-  refreshTokens: RefreshToken[];
+  refreshTokens?: RefreshToken[];
 
   @OneToMany(() => AuditLog, (auditLog) => auditLog.user)
-  auditLogs: AuditLog[];
+  auditLogs?: AuditLog[];
 
   @OneToMany(() => ResetPasswordToken, (token) => token.user)
-  resetTokens: ResetPasswordToken[];
+  resetTokens?: ResetPasswordToken[];
+
+  // category RELATION
+  @OneToMany(() => Category, (category) => category.createdUser)
+  createdCategories?: Category[];
+
+  @OneToMany(() => Category, (category) => category.updatedUser)
+  updatedCategories?: Category[];
 }
