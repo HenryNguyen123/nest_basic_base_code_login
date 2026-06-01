@@ -5,6 +5,12 @@ import {
   Post,
   UseGuards,
   Delete,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UseInterceptors,
+  UploadedFile,
+  Req,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Permissions } from 'src/permissions/decorators/permission.decorator';
@@ -13,13 +19,18 @@ import { PermissionsGuard } from 'src/permissions/guards/permissions.guard';
 import { Roles } from 'src/roles/decorators/roles.decorator';
 import { RoleEnum } from 'src/roles/enums/role.enum';
 import { RolesGuard } from 'src/roles/guards/roles.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { CategoryCreateRequest } from 'src/categories/dtos/request/category-create.request.dto';
+import { CategoryService } from 'src/categories/services/category.service';
+import { UploadFileInterceptor } from 'src/commons/interceptors/upload-file.interceptor';
+import { RoleAdminGuard } from 'src/auth/guards/role-admin.guard';
+import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
 
 @ApiTags('categories')
 @ApiBearerAuth()
 @Controller('categories')
 export class CategoryController {
-  constructor() {}
+  constructor(private categoryService: CategoryService) {}
 
   //test
   @Get('test')
@@ -31,7 +42,22 @@ export class CategoryController {
   }
   //create category
   @Post('create')
-  async create() {}
+  @UseGuards(JwtAuthGuard, RoleAdminGuard)
+  @ApiBody({
+    type: CategoryCreateRequest,
+  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(UploadFileInterceptor('image', './public/images/category'))
+  @HttpCode(HttpStatus.CREATED)
+  async create(
+    @Req() req: Request,
+    @Body() body: CategoryCreateRequest,
+    @UploadedFile() file: Express.Multer.File | null,
+  ) {
+    const path: string = '/images/category';
+    const user = req['user'] as IJwtPayload;
+    await this.categoryService.create(body, file, path, user);
+  }
   //read category
   @Get('read')
   async read() {}

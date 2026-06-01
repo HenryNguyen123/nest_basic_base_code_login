@@ -18,14 +18,14 @@ export class CategoryCreateRequest {
   @MinLength(2)
   name!: string;
 
-  @ApiProperty({
-    example: 'category one',
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsString()
-  @MinLength(2)
-  slug!: string;
+  // @ApiProperty({
+  //   example: 'category one',
+  //   required: true,
+  // })
+  // @IsNotEmpty()
+  // @IsString()
+  // @MinLength(2)
+  // slug!: string;
 
   @ApiProperty({
     example: 'description category one',

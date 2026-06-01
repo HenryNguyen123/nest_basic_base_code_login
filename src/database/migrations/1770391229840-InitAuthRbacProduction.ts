@@ -173,7 +173,7 @@ export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
     await queryRunner.query(`
       CREATE TABLE categories (
         id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
+        name VARCHAR(255) UNIQUE NOT NULL,
         slug VARCHAR(255) UNIQUE NOT NULL,  
         description TEXT,
         image VARCHAR(255),
