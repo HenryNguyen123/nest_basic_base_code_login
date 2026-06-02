@@ -61,6 +61,7 @@ export class CategoryService {
       createdAt: Date(),
     });
     await this.cateRepository.save(cateEntity);
+    console.log('categories log: ', cateEntity);
   }
   //read category
   async read() {}

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsNotEmpty,
@@ -49,14 +50,16 @@ export class CategoryCreateRequest {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   parentId?: number;
 
   @ApiProperty({
-    example: false,
+    example: true,
     required: false,
   })
   @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
   isActive?: boolean;
 }
