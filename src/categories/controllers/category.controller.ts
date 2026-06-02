@@ -25,6 +25,7 @@ import { CategoryService } from 'src/categories/services/category.service';
 import { UploadFileInterceptor } from 'src/commons/interceptors/upload-file.interceptor';
 import { RoleAdminGuard } from 'src/auth/guards/role-admin.guard';
 import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
+import { CategoryReadReponse } from 'src/categories/dtos/response/categories-read.response';
 
 @ApiTags('categories')
 @ApiBearerAuth()
@@ -60,7 +61,9 @@ export class CategoryController {
   }
   //read category
   @Get('read')
-  async read() {}
+  async read(): Promise<CategoryReadReponse> {
+    return await this.categoryService.read();
+  }
   //update category
   @Patch('update')
   async update() {}

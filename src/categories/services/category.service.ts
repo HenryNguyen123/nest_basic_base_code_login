@@ -11,6 +11,8 @@ import slugify from 'slugify';
 import { pathFileName } from 'src/commons/utils/path-file-name.util';
 import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
 import { User } from 'src/users/entities/user.entity';
+import { CategoryReadReponse } from 'src/categories/dtos/response/categories-read.response';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class CategoryService {
@@ -64,7 +66,19 @@ export class CategoryService {
     console.log('categories log: ', cateEntity);
   }
   //read category
-  async read() {}
+  async read() {
+    const cateLog = await this.cateRepository.find({});
+    const payload: CategoryReadReponse[] = cateLog.map((item) => ({
+      name: item.name,
+      slug: item.slug,
+      description: item.description ?? undefined,
+      image: item.image ?? undefined,
+      isActive: item.isActive,
+      parentId: item.parentId,
+      createdAt: item.createdAt ?? undefined,
+    }));
+    return plainToInstance(CategoryReadReponse, { payload });
+  }
   //update category
   async update() {}
   //delete category
