@@ -66,7 +66,10 @@ export class CategoryController {
   }
   //update category
   @Patch('update')
-  async update() {}
+  @UseGuards(JwtAuthGuard, RoleAdminGuard)
+  async update() {
+    return await this.categoryService.update();
+  }
   //delete category
   @Delete('delete')
   async destroy() {}
