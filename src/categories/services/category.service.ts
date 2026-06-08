@@ -13,6 +13,8 @@ import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
 import { User } from 'src/users/entities/user.entity';
 import { CategoryReadReponse } from 'src/categories/dtos/response/categories-read.response';
 import { plainToInstance } from 'class-transformer';
+import { CategoryUpdateReq } from 'src/categories/dtos/request/category-update.request.dto';
+import { RoleCode } from 'src/auth/enums/role-code.enum';
 
 @Injectable()
 export class CategoryService {
@@ -36,7 +38,7 @@ export class CategoryService {
       strict: true,
     });
     if (!parentId) {
-      parentId = 0;
+      parentId = 1;
     }
     //check admin exist
     const admin = await this.userRepository.findOne({
@@ -80,7 +82,57 @@ export class CategoryService {
     return plainToInstance(CategoryReadReponse, { payload });
   }
   //update category
-  async update() {}
+  async update(
+    body: CategoryUpdateReq,
+    user: IJwtPayload,
+    file: Express.Multer.File | null,
+    path: string,
+  ) {
+    const { id, name, description, parentId, isActive } = body;
+    const { sub, email } = user;
+    let pathCate: string | null = null;
+    if (file) {
+      pathCate = pathFileName(file, path);
+    }
+    const valisRole = [RoleCode.ADMIN, RoleCode.SUPERADMIN];
+    let slug = '';
+    if (name) {
+      slug = slugify(name, {
+        lower: true,
+        strict: true,
+      });
+    }
+    //check admin
+    const admin = await this.userRepository.findOne({
+      where: { email, id: sub },
+      relations: {
+        userRoles: { role: true },
+      },
+    });
+    if (!admin) throw new InternalServerErrorException('user not exist!');
+    const roleCheck = admin.userRoles.some((ur) =>
+      valisRole.includes(ur.role.code as RoleCode),
+    );
+    if (!roleCheck) throw new InternalServerErrorException('role not exist!');
+    //check exist
+    const cate = await this.cateRepository.findOne({
+      where: { id },
+    });
+    if (!cate) throw new InternalServerErrorException('category not exist!');
+    if ()
+      
+    const cateUpdate = await this.cateRepository.update(cate.id, {
+      name: name ?? cate.name,
+      slug: name ? slug : cate.slug,
+      description: description ?? cate.description,
+      image: pathCate ?? cate.image,
+      parentId: parentId ?? cate.parentId,
+      isActive: isActive ?? cate.isActive,
+      updatedBy: admin.id,
+      updatedAt: Date(),
+    });
+    return cateUpdate;
+  }
   //delete category
   async destroy() {}
 }

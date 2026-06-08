@@ -26,6 +26,7 @@ import { UploadFileInterceptor } from 'src/commons/interceptors/upload-file.inte
 import { RoleAdminGuard } from 'src/auth/guards/role-admin.guard';
 import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
 import { CategoryReadReponse } from 'src/categories/dtos/response/categories-read.response';
+import { CategoryUpdateReq } from 'src/categories/dtos/request/category-update.request.dto';
 
 @ApiTags('categories')
 @ApiBearerAuth()
@@ -67,8 +68,19 @@ export class CategoryController {
   //update category
   @Patch('update')
   @UseGuards(JwtAuthGuard, RoleAdminGuard)
-  async update() {
-    return await this.categoryService.update();
+  @ApiBody({
+    type: CategoryUpdateReq,
+  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(UploadFileInterceptor('image', './public/images/category'))
+  async update(
+    @Body() body: CategoryUpdateReq,
+    @Req() req: Request,
+    @UploadedFile() file: Express.Multer.File | null,
+  ) {
+    const path: string = '/images/category';
+    const user = req['user'] as IJwtPayload;
+    return await this.categoryService.update(body, user, file, path);
   }
   //delete category
   @Delete('delete')
