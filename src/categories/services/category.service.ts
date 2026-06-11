@@ -88,7 +88,8 @@ export class CategoryService {
     file: Express.Multer.File | null,
     path: string,
   ) {
-    const { id, name, description, parentId, isActive } = body;
+    let { parentId } = body;
+    const { id, name, description, isActive } = body;
     const { sub, email } = user;
     let pathCate: string | null = null;
     if (file) {
@@ -119,8 +120,12 @@ export class CategoryService {
       where: { id },
     });
     if (!cate) throw new InternalServerErrorException('category not exist!');
-    if ()
-      
+    //check not exist new parend Id and old parent id
+    if ((!cate.parentId || cate.parentId == 0) && !parentId) {
+      parentId = 1;
+    }
+    console.log('parent id cate is: ', cate.parentId);
+    console.log('parent id request is: ', parentId);
     const cateUpdate = await this.cateRepository.update(cate.id, {
       name: name ?? cate.name,
       slug: name ? slug : cate.slug,
