@@ -65,7 +65,6 @@ export class CategoryService {
       createdAt: Date(),
     });
     await this.cateRepository.save(cateEntity);
-    console.log('categories log: ', cateEntity);
   }
   //read category
   async read() {
@@ -121,8 +120,18 @@ export class CategoryService {
     });
     if (!cate) throw new InternalServerErrorException('category not exist!');
     //check not exist new parend Id and old parent id
-    if ((!cate.parentId || cate.parentId == 0) && !parentId) {
+    // check parent id exist??????
+    if (parentId !== 0) {
+      const prarentIdExist = await this.cateRepository.findOne({
+        where: { id: parentId },
+      });
+      if (!prarentIdExist)
+        throw new InternalServerErrorException('category" parent not exist!');
+    }
+    if (!cate.parentId && parentId == 0) {
       parentId = 1;
+    } else if (cate.parentId && parentId == 0) {
+      parentId = cate.parentId;
     }
     console.log('parent id cate is: ', cate.parentId);
     console.log('parent id request is: ', parentId);
