@@ -1,7 +1,10 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryCreateRequest } from 'src/categories/dtos/request/category-create.request.dto';
@@ -15,6 +18,7 @@ import { CategoryReadReponse } from 'src/categories/dtos/response/categories-rea
 import { plainToInstance } from 'class-transformer';
 import { CategoryUpdateReq } from 'src/categories/dtos/request/category-update.request.dto';
 import { RoleCode } from 'src/auth/enums/role-code.enum';
+import { CateDeleteRequestDto } from 'src/categories/dtos/request/categody-destroy.request.dto';
 
 @Injectable()
 export class CategoryService {
@@ -37,8 +41,17 @@ export class CategoryService {
       lower: true,
       strict: true,
     });
-    if (!parentId) {
-      parentId = 1;
+    //check parent id
+    if (parentId === 0) {
+      parentId = undefined;
+    }
+    if (parentId) {
+      const cateExist = await this.cateRepository.findOne({
+        where: { id: parentId },
+      });
+      if (!cateExist)
+        throw new UnauthorizedException('category of parent id not exist!');
+      parentId = cateExist.id;
     }
     //check admin exist
     const admin = await this.userRepository.findOne({
@@ -59,12 +72,13 @@ export class CategoryService {
       slug,
       description,
       image: pathCate != null ? pathCate : undefined,
-      parentId,
+      parentId: parentId ?? undefined,
       isActive,
       createdBy: admin.id,
       createdAt: Date(),
     });
-    await this.cateRepository.save(cateEntity);
+    const cate = await this.cateRepository.save(cateEntity);
+    console.log('cate is: ', cate);
   }
   //read category
   async read() {
@@ -148,5 +162,19 @@ export class CategoryService {
     return cateUpdate;
   }
   //delete category
-  async destroy() {}
+  async destroy(body: CateDeleteRequestDto) {
+    const cateCheck = await this.cateRepository.findOne({
+      where: { id: body.id },
+    });
+    if (!cateCheck) throw new NotFoundException('Category not found');
+    const checkCount = await this.cateRepository.count({
+      where: { parentId: cateCheck.id },
+    });
+    if (checkCount > 0)
+      throw new BadRequestException(
+        'Category has child categories, cannot delete',
+      );
+    const res = await this.cateRepository.delete(cateCheck.id);
+    if (res.affected === 0) throw new NotFoundException('category not found');
+  }
 }

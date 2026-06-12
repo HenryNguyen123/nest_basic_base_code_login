@@ -27,6 +27,7 @@ import { RoleAdminGuard } from 'src/auth/guards/role-admin.guard';
 import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
 import { CategoryReadReponse } from 'src/categories/dtos/response/categories-read.response';
 import { CategoryUpdateReq } from 'src/categories/dtos/request/category-update.request.dto';
+import { CateDeleteRequestDto } from 'src/categories/dtos/request/categody-destroy.request.dto';
 
 @ApiTags('categories')
 @ApiBearerAuth()
@@ -84,5 +85,12 @@ export class CategoryController {
   }
   //delete category
   @Delete('delete')
-  async destroy() {}
+  @UseGuards(JwtAuthGuard, RoleAdminGuard)
+  @HttpCode(204)
+  @ApiBody({
+    type: CateDeleteRequestDto,
+  })
+  async destroy(@Body() body: CateDeleteRequestDto) {
+    await this.categoryService.destroy(body);
+  }
 }

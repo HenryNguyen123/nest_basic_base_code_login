@@ -46,7 +46,7 @@ export class CategoryCreateRequest {
   image?: any;
 
   @ApiProperty({
-    example: 1,
+    example: null,
     required: false,
   })
   @IsOptional()
