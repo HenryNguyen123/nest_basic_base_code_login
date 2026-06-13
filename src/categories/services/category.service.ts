@@ -177,4 +177,23 @@ export class CategoryService {
     const res = await this.cateRepository.delete(cateCheck.id);
     if (res.affected === 0) throw new NotFoundException('category not found');
   }
+  async findById(id: number) {
+    const result = [] as Category[];
+    let current = await this.cateRepository.findOne({
+      where: { id },
+    });
+    if (!current) {
+      throw new NotFoundException('Category not found');
+    }
+    while (current) {
+      result.unshift(current);
+      if (!current.parentId) {
+        break;
+      }
+      current = await this.cateRepository.findOne({
+        where: { id: current.parentId },
+      });
+    }
+    return result;
+  }
 }

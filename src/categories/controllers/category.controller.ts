@@ -11,6 +11,8 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
+  Param,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Permissions } from 'src/permissions/decorators/permission.decorator';
@@ -92,5 +94,10 @@ export class CategoryController {
   })
   async destroy(@Body() body: CateDeleteRequestDto) {
     await this.categoryService.destroy(body);
+  }
+  //find category by id
+  @Get(':id')
+  async findById(@Param('id', ParseIntPipe) id: number) {
+    return await this.categoryService.findById(id);
   }
 }
