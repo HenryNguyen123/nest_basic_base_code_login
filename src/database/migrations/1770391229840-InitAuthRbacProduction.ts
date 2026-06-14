@@ -242,6 +242,7 @@ export class InitAuthRbacProduction1770391229840 implements MigrationInterface {
 
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
         CONSTRAINT fk_product_category
           FOREIGN KEY (category_id)
           REFERENCES categories(id)

@@ -1,3 +1,4 @@
+import { Product } from 'src/catalogs/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -78,4 +79,8 @@ export class Category {
   })
   @JoinColumn({ name: 'updated_by' })
   updatedUser?: User;
+
+  // PRODUCT RELATION
+  @OneToMany(() => Product, (product) => product.category)
+  product!: Product[];
 }
