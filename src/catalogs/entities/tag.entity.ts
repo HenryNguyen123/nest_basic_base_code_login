@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { ProductTag } from 'src/catalogs/entities/product-tag.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('tags')
 export class Tag {
@@ -10,4 +11,8 @@ export class Tag {
 
   @Column({ unique: true, nullable: false, length: 100 })
   slug!: string;
+
+  // PRODUCT TAG RELATION
+  @OneToMany(() => ProductTag, (productTag) => productTag.tag)
+  productTag?: ProductTag;
 }
