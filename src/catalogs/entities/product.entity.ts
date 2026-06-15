@@ -1,3 +1,4 @@
+import { ProductImage } from 'src/catalogs/entities/product-image.entity';
 import { Category } from 'src/categories/entities/category.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -6,6 +7,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -73,7 +75,7 @@ export class Product {
   @UpdateDateColumn({ nullable: true, name: 'updated_at' })
   updatedAt?: Date;
 
-  // CATEGORY RELATION
+  // user RELATION
   @ManyToOne(() => User, {
     nullable: true,
     onDelete: 'SET NULL',
@@ -88,10 +90,15 @@ export class Product {
   @JoinColumn({ name: 'updated_by' })
   updatedUser?: User;
 
+  // CATEGORY RELATION
   @ManyToOne(() => Category, {
     nullable: false,
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'category_id' })
   category!: Category;
+
+  // PRODUCT IMAGE RELATION
+  @OneToMany(() => ProductImage, (productImage) => productImage.product)
+  productImages!: ProductImage[];
 }
