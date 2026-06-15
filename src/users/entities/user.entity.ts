@@ -11,6 +11,7 @@ import {
 import { AuditLog } from 'src/audits/entities/audit-log.entity';
 import { RefreshToken } from 'src/auth/entities/refresh-token.entity';
 import { ResetPasswordToken } from 'src/auth/entities/reset-password-token.entity';
+import { InventoryLog } from 'src/catalogs/entities/inventory-log.entity';
 import { Category } from 'src/categories/entities/category.entity';
 import { UserRole } from 'src/roles/entities/user-role.entity';
 import { Profile } from 'src/users/entities/profile.entity';
@@ -96,4 +97,8 @@ export class User {
 
   @OneToMany(() => Category, (category) => category.updatedUser)
   updatedCategories?: Category[];
+
+  // INVENTORY LOGS RELATION
+  @OneToMany(() => InventoryLog, (inventoryLog) => inventoryLog.user)
+  inventoryLogs?: InventoryLog[];
 }

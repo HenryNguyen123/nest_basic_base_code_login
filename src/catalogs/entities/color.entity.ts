@@ -26,5 +26,5 @@ export class Color {
 
   // PRODUCT VARIANT RELATION
   @OneToMany(() => ProductVariant, (productVariant) => productVariant.color)
-  productVariant?: ProductVariant[];
+  productVariants?: ProductVariant[];
 }

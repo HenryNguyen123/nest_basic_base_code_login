@@ -106,9 +106,9 @@ export class Product {
 
   // PRODUCT VARIANT RELATION
   @OneToMany(() => ProductVariant, (productVariant) => productVariant.product)
-  productVariant?: ProductVariant[];
+  productVariants?: ProductVariant[];
 
   // PRODUCT TAG RELATION
   @OneToMany(() => ProductTag, (productTag) => productTag.product)
-  productTag?: ProductTag[];
+  productTags?: ProductTag[];
 }

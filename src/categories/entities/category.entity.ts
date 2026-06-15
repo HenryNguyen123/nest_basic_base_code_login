@@ -82,5 +82,5 @@ export class Category {
 
   // PRODUCT RELATION
   @OneToMany(() => Product, (product) => product.category)
-  product!: Product[];
+  products!: Product[];
 }

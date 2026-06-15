@@ -23,5 +23,5 @@ export class Size {
 
   // PRODUCT VARIANT RELATION
   @OneToMany(() => ProductVariant, (productVariant) => productVariant.size)
-  productVariant?: ProductVariant[];
+  productVariants?: ProductVariant[];
 }

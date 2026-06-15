@@ -1,4 +1,5 @@
 import { Color } from 'src/catalogs/entities/color.entity';
+import { InventoryLog } from 'src/catalogs/entities/inventory-log.entity';
 import { Product } from 'src/catalogs/entities/product.entity';
 import { Size } from 'src/catalogs/entities/size.entity';
 import {
@@ -7,6 +8,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -71,4 +73,8 @@ export class ProductVariant {
   })
   @JoinColumn({ name: 'size_id' })
   size?: Size;
+
+  // INVENTORY LOGS RELATION
+  @OneToMany(() => InventoryLog, (inventoryLog) => inventoryLog.productVariants)
+  inventoryLogs?: InventoryLog[];
 }
