@@ -1,7 +1,9 @@
+import { ProductVariant } from 'src/catalogs/entities/product-variant.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -18,4 +20,8 @@ export class Size {
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
+
+  // PRODUCT VARIANT RELATION
+  @OneToMany(() => ProductVariant, (productVariant) => productVariant.size)
+  productVariant?: ProductVariant[];
 }

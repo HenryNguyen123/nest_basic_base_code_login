@@ -1,4 +1,5 @@
 import { ProductImage } from 'src/catalogs/entities/product-image.entity';
+import { ProductVariant } from 'src/catalogs/entities/product-variant.entity';
 import { Category } from 'src/categories/entities/category.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -101,4 +102,8 @@ export class Product {
   // PRODUCT IMAGE RELATION
   @OneToMany(() => ProductImage, (productImage) => productImage.product)
   productImages!: ProductImage[];
+
+  // PRODUCT VARIANT RELATION
+  @OneToMany(() => ProductVariant, (productVariant) => productVariant.product)
+  productVariant?: ProductVariant[];
 }
