@@ -13,6 +13,7 @@ import { PermissionModule } from 'src/permissions/permission.module';
 import { MailModule } from 'src/mails/mail.module';
 import { UserModule } from 'src/users/user.module';
 import { RoleModule } from 'src/roles/role.module';
+import { CatalogModule } from 'src/catalogs/catalog.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -41,6 +42,7 @@ import { RoleModule } from 'src/roles/role.module';
     UserModule,
     RoleModule,
     CategoryModule,
+    CatalogModule,
   ],
   controllers: [AppController],
   providers: [AppService],

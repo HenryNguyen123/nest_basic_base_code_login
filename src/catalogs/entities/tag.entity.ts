@@ -14,5 +14,5 @@ export class Tag {
 
   // PRODUCT TAG RELATION
   @OneToMany(() => ProductTag, (productTag) => productTag.tag)
-  productTag?: ProductTag;
+  productTags?: ProductTag;
 }

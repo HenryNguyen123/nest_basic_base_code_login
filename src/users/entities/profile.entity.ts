@@ -1,10 +1,4 @@
-import {
-  IsDate,
-  IsNotEmpty,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsDate, IsString, MaxLength, MinLength } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -17,13 +11,13 @@ import {
 @Entity('profiles')
 export class Profile {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ name: 'full_name' })
   @IsString()
   @MinLength(3)
   @MaxLength(20)
-  fullName: string;
+  fullName!: string;
 
   @Column({ nullable: true })
   @IsString()
@@ -47,9 +41,9 @@ export class Profile {
 
   @Column({ name: 'created_at' })
   @IsDate()
-  createdAt: Date;
+  createdAt?: Date;
 
   @OneToOne(() => User, (user) => user.profile, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user!: User;
 }

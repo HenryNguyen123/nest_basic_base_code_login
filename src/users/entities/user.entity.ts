@@ -50,7 +50,7 @@ export class User {
 
   @Column({ name: 'is_active', default: true })
   @IsBoolean()
-  isActive?: boolean;
+  isActive!: boolean;
 
   @Column({ name: 'is_verified' })
   @IsBoolean()
@@ -77,10 +77,10 @@ export class User {
   updatedAt?: Date;
 
   @OneToOne(() => Profile, (profile) => profile.user)
-  profile?: Profile;
+  profile!: Profile;
 
   @OneToMany(() => UserRole, (userRole) => userRole.user)
-  userRoles?: UserRole[];
+  userRoles!: UserRole[];
 
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
   refreshTokens?: RefreshToken[];
