@@ -118,6 +118,7 @@ export class UserService {
   }
   //update
   async update(
+    id: number,
     body: UpdateNewUserResDto,
     file: Express.Multer.File | null,
     path: string,
@@ -125,7 +126,7 @@ export class UserService {
     const email: string = body.email;
     const roleCode: string | null = body.roleCode ?? null;
     const userCheck = await this.userRepository.findOne({
-      where: [{ email }, { email }],
+      where: [{ id }, { id }],
       relations: {
         profile: true,
         userRoles: true,

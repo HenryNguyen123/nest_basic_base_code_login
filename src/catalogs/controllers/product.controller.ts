@@ -9,6 +9,9 @@ export class ProductController {
   constructor(private productService: ProductService) {}
   @Get('test')
   async test() {
-    return await this.productService.test();
+    const start = performance.now();
+    const res = await this.productService.test();
+    console.log(`MySQL: ${(performance.now() - start).toFixed(4)} ms`);
+    return res;
   }
 }

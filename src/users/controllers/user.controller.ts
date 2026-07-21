@@ -31,7 +31,7 @@ import { UserService } from 'src/users/services/user.service';
 export class UserController {
   constructor(private userService: UserService) {}
   //create
-  @Post('create')
+  @Post()
   @UseGuards(JwtAuthGuard, RoleAdminGuard)
   @HttpCode(HttpStatus.CREATED)
   @ApiConsumes('multipart/form-data')
@@ -47,21 +47,22 @@ export class UserController {
     await this.userService.create(createUserDto, file, path);
   }
   //update
-  @Patch('update')
+  @Patch(':id')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     type: UpdateNewUserResDto,
   })
   @UseInterceptors(UploadFileInterceptor('avatar', './public/images/avatar'))
   async update(
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateNewUserResDto,
     @UploadedFile() file: Express.Multer.File | null,
   ): Promise<UserResponseDto> {
     const path: string = '/images/avatar';
-    return this.userService.update(updateUserDto, file, path);
+    return this.userService.update(id, updateUserDto, file, path);
   }
   //read
-  @Get('read')
+  @Get()
   async read(): Promise<ReadUserResponseDto> {
     return await this.userService.read();
   }
@@ -73,7 +74,7 @@ export class UserController {
     return await this.userService.findById(id);
   }
   //update status user
-  @Patch('update/:id/status')
+  @Patch(':id/status')
   @ApiBody({
     type: UpdateStatusUserDto,
   })
@@ -84,7 +85,7 @@ export class UserController {
     return await this.userService.updateStatus(body, id);
   }
   //delete user
-  @Delete('delete')
+  @Delete()
   @UseGuards(JwtAuthGuard, RoleAdminGuard)
   @HttpCode(204)
   @ApiBody({
