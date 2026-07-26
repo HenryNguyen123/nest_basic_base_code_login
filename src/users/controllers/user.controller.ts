@@ -75,6 +75,7 @@ export class UserController {
   }
   //update status user
   @Patch(':id/status')
+  @UseGuards(JwtAuthGuard, RoleAdminGuard)
   @ApiBody({
     type: UpdateStatusUserDto,
   })

@@ -123,7 +123,7 @@ export class UserService {
     file: Express.Multer.File | null,
     path: string,
   ) {
-    const email: string = body.email;
+    // const email: string = body.email;
     const roleCode: string | null = body.roleCode ?? null;
     const userCheck = await this.userRepository.findOne({
       where: [{ id }, { id }],
@@ -166,7 +166,7 @@ export class UserService {
       if (!resultRoleUser) throw new NotFoundException('UserRole not found');
     }
     const user = await this.userRepository.findOne({
-      where: { email: email },
+      where: { id: id },
       relations: {
         profile: true,
         userRoles: {
