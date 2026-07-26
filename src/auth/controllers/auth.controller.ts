@@ -19,6 +19,7 @@ import type { Request } from 'express';
 import { RegisterDto } from 'src/auth/dtos/request/register.request.dto';
 import { UploadFileInterceptor } from 'src/commons/interceptors/upload-file.interceptor';
 import { VerifyDto } from 'src/auth/dtos/request/verify.request.dto';
+import { IPayloadJWTLogin } from 'src/auth/interfaces/login.interface';
 
 @ApiTags('auth')
 @ApiBearerAuth()
@@ -41,7 +42,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async logout(@Ip() ip: string, @Req() req: Request): Promise<void> {
-    const user = req['user'];
+    const user = req['user'] as IPayloadJWTLogin;
     await this.authService.logout(user, ip);
   }
 
