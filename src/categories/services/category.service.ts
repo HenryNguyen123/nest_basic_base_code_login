@@ -96,13 +96,14 @@ export class CategoryService {
   }
   //update category
   async update(
+    id: number,
     body: CategoryUpdateReq,
     user: IJwtPayload,
     file: Express.Multer.File | null,
     path: string,
   ) {
     let { parentId } = body;
-    const { id, name, description, isActive } = body;
+    const { name, description, isActive } = body;
     const { sub, email } = user;
     let pathCate: string | null = null;
     if (file) {

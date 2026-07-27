@@ -2,21 +2,21 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
-  IsNotEmpty,
+  // IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
 
 export class CategoryUpdateReq {
-  @ApiProperty({
-    example: 1,
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsNumber()
-  @Type(() => Number)
-  id!: number;
+  // @ApiProperty({
+  //   example: 1,
+  //   required: true,
+  // })
+  // @IsNotEmpty()
+  // @IsNumber()
+  // @Type(() => Number)
+  // id!: number;
 
   @ApiProperty({
     example: 'category one',

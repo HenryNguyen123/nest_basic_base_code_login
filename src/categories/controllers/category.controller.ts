@@ -46,7 +46,7 @@ export class CategoryController {
     return 'test';
   }
   //create category
-  @Post('create')
+  @Post()
   @UseGuards(JwtAuthGuard, RoleAdminGuard)
   @ApiBody({
     type: CategoryCreateRequest,
@@ -64,12 +64,12 @@ export class CategoryController {
     await this.categoryService.create(body, file, path, user);
   }
   //read category
-  @Get('read')
+  @Get()
   async read(): Promise<CategoryReadReponse> {
     return await this.categoryService.read();
   }
   //update category
-  @Patch('update')
+  @Patch(':id')
   @UseGuards(JwtAuthGuard, RoleAdminGuard)
   @ApiBody({
     type: CategoryUpdateReq,
@@ -77,16 +77,17 @@ export class CategoryController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(UploadFileInterceptor('image', './public/images/category'))
   async update(
+    @Param('id', ParseIntPipe) id: number,
     @Body() body: CategoryUpdateReq,
     @Req() req: Request,
     @UploadedFile() file: Express.Multer.File | null,
   ) {
     const path: string = '/images/category';
     const user = req['user'] as IJwtPayload;
-    return await this.categoryService.update(body, user, file, path);
+    return await this.categoryService.update(id, body, user, file, path);
   }
   //delete category
-  @Delete('delete')
+  @Delete()
   @UseGuards(JwtAuthGuard, RoleAdminGuard)
   @HttpCode(204)
   @ApiBody({

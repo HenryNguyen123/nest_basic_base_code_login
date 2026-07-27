@@ -17,20 +17,19 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RoleAdminGuard } from 'src/auth/guards/role-admin.guard';
 import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
 import { RoleCreateRequest } from 'src/roles/dtos/request/role-create.request.dto';
-import { RoleDeleteRequestDto } from 'src/roles/dtos/request/role-delete.request.dto';
 import { UpdateRoleRequest } from 'src/roles/dtos/request/role-update.request.dto';
 import { RoleFindByIdReponse } from 'src/roles/dtos/response/role-find-by-id.resquest.dto';
 import { RoleReadResponse } from 'src/roles/dtos/response/role-read.response.dto';
 import { RoleResponseDto } from 'src/roles/dtos/response/role.response.dto';
 import { RoleService } from 'src/roles/services/role.service';
 
-@ApiTags('role')
+@ApiTags('roles')
 @ApiBearerAuth()
-@Controller('role')
+@Controller('roles')
 export class RoleController {
   constructor(private roleService: RoleService) {}
   //create role by admin
-  @Post('create')
+  @Post()
   @UseGuards(JwtAuthGuard, RoleAdminGuard)
   @HttpCode(HttpStatus.CREATED)
   @ApiBody({
@@ -41,29 +40,29 @@ export class RoleController {
     await this.roleService.create(jwtPayload, body);
   }
   //read role by admin
-  @Get('read')
+  @Get()
   @UseGuards(JwtAuthGuard, RoleAdminGuard)
   async read(): Promise<RoleReadResponse> {
     return await this.roleService.read();
   }
   //update role by admin
-  @Patch('update')
+  @Patch(':id')
   @UseGuards(JwtAuthGuard, RoleAdminGuard)
   @ApiBody({
     type: UpdateRoleRequest,
   })
-  async update(@Body() body: UpdateRoleRequest): Promise<RoleResponseDto> {
-    return await this.roleService.update(body);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateRoleRequest,
+  ): Promise<RoleResponseDto> {
+    return await this.roleService.update(id, body);
   }
   //delete role by admin
   @Delete('destroy')
   @UseGuards(JwtAuthGuard, RoleAdminGuard)
-  @HttpCode(204)
-  @ApiBody({
-    type: RoleDeleteRequestDto,
-  })
-  async destroy(@Body() body: RoleDeleteRequestDto) {
-    await this.roleService.destroy(body);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async destroy(@Param('id', ParseIntPipe) id: number) {
+    await this.roleService.destroy(id);
   }
   // find role by id
   @Get(':id')
@@ -77,8 +76,8 @@ export class RoleController {
   // USER ROLE
   ////////////////////////////////
   //crate user-role by admin
-  @Post('user-role/create')
-  async userRoleCreate() {
-    return await this.roleService.userRoleCreate();
-  }
+  // @Post('user-role/create')
+  // async userRoleCreate() {
+  //   return await this.roleService.userRoleCreate();
+  // }
 }

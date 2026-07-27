@@ -9,7 +9,6 @@ import { plainToInstance } from 'class-transformer';
 import { RoleCode } from 'src/auth/enums/role-code.enum';
 import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
 import { RoleCreateRequest } from 'src/roles/dtos/request/role-create.request.dto';
-import { RoleDeleteRequestDto } from 'src/roles/dtos/request/role-delete.request.dto';
 import { UpdateRoleRequest } from 'src/roles/dtos/request/role-update.request.dto';
 import { RoleReadResponse } from 'src/roles/dtos/response/role-read.response.dto';
 import { RoleResponseDto } from 'src/roles/dtos/response/role.response.dto';
@@ -80,11 +79,12 @@ export class RoleService {
     return plainToInstance(RoleReadResponse, { payload });
   }
   // update role by admin
-  async update(body: UpdateRoleRequest) {
+  async update(id: number, body: UpdateRoleRequest) {
     const { codeOld, name, code, description } = body;
     if (!codeOld) throw new UnauthorizedException('code old do not exist');
     const roleCheck = await this.roleRepository.findOne({
-      where: { code: codeOld },
+      where: { id },
+      // where: { code: codeOld },
     });
     if (!roleCheck) throw new UnauthorizedException('User exist');
     const role = await this.roleRepository.update(roleCheck.id, {
@@ -105,11 +105,9 @@ export class RoleService {
     return plainToInstance(RoleResponseDto, { payload });
   }
   //delete role by admin as check code role
-  async destroy(body: RoleDeleteRequestDto) {
-    const code = body.code;
-    if (!code) throw new NotFoundException('role not found');
+  async destroy(id: number) {
     const checkRole = await this.roleRepository.findOne({
-      where: { code },
+      where: { id },
     });
     if (!checkRole) throw new NotFoundException('role not found');
     const res = await this.roleRepository.delete(checkRole.id);

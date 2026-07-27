@@ -5,16 +5,16 @@ import { Role } from './role.entity';
 @Entity('user_roles')
 export class UserRole {
   @PrimaryColumn({ name: 'user_id' })
-  userId: number;
+  userId!: number;
 
   @PrimaryColumn({ name: 'role_id' })
-  roleId: number;
+  roleId!: number;
 
   @ManyToOne(() => User, (user) => user.userRoles, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user!: User;
 
   @ManyToOne(() => Role, (role) => role.userRoles, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'role_id' })
-  role: Role;
+  role!: Role;
 }
