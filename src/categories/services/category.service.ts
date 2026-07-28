@@ -10,7 +10,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryCreateRequest } from 'src/categories/dtos/request/category-create.request.dto';
 import { Category } from 'src/categories/entities/category.entity';
 import { Repository } from 'typeorm';
-import slugify from 'slugify';
 import { pathFileName } from 'src/commons/utils/path-file-name.util';
 import { IJwtPayload } from 'src/auth/interfaces/jwt.interface';
 import { User } from 'src/users/entities/user.entity';
@@ -19,6 +18,7 @@ import { plainToInstance } from 'class-transformer';
 import { CategoryUpdateReq } from 'src/categories/dtos/request/category-update.request.dto';
 import { RoleCode } from 'src/auth/enums/role-code.enum';
 import { CateDeleteRequestDto } from 'src/categories/dtos/request/categody-destroy.request.dto';
+import { generateSlug } from 'src/commons/utils/slug.util';
 
 @Injectable()
 export class CategoryService {
@@ -37,10 +37,7 @@ export class CategoryService {
   ) {
     const { name, description, isActive } = body;
     let { parentId } = body;
-    const slug = slugify(name, {
-      lower: true,
-      strict: true,
-    });
+    const slug = generateSlug(name);
     //check parent id
     if (parentId === 0) {
       parentId = undefined;
@@ -105,19 +102,12 @@ export class CategoryService {
     let { parentId } = body;
     const { name, description, isActive } = body;
     const { sub, email } = user;
+    const slug = generateSlug(name);
     let pathCate: string | null = null;
     if (file) {
       pathCate = pathFileName(file, path);
     }
     const valisRole = [RoleCode.ADMIN, RoleCode.SUPERADMIN];
-    let slug = '';
-    if (name) {
-      slug = slugify(name, {
-        lower: true,
-        strict: true,
-      });
-    }
-    //check admin
     const admin = await this.userRepository.findOne({
       where: { email, id: sub },
       relations: {

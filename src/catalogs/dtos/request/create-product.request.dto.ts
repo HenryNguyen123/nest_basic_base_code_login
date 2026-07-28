@@ -34,16 +34,16 @@ export class CreateProductRequest {
   @MaxLength(255)
   name!: string;
 
-  @ApiProperty({
-    example: 'slug-1',
-    required: true,
-    nullable: false,
-  })
-  @IsNotEmpty()
-  @IsString()
-  @MinLength(2)
-  @MaxLength(255)
-  slug!: string;
+  // @ApiProperty({
+  //   example: 'slug-1',
+  //   required: true,
+  //   nullable: false,
+  // })
+  // @IsNotEmpty()
+  // @IsString()
+  // @MinLength(2)
+  // @MaxLength(255)
+  // slug!: string;
 
   @ApiProperty({
     example: 'sku-1',
@@ -141,13 +141,13 @@ export class CreateProductRequest {
   @IsInt()
   createdBy?: number;
 
-  @ApiProperty({
-    nullable: true,
-  })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  updatedBy?: number;
+  // @ApiProperty({
+  //   nullable: true,
+  // })
+  // @IsOptional()
+  // @Type(() => Number)
+  // @IsInt()
+  // updatedBy?: number;
 
   @ApiProperty({
     nullable: true,
