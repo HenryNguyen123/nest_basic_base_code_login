@@ -3,12 +3,12 @@ import { UserResponseDto } from 'src/users/dtos/response/user.response.dto';
 
 export class LoginResponseDto {
   @Expose()
-  accessToken: string;
+  accessToken!: string;
 
   @Expose()
-  refreshToken: string;
+  refreshToken!: string;
 
   @Expose()
   @Type(() => UserResponseDto)
-  user: UserResponseDto;
+  user!: UserResponseDto;
 }

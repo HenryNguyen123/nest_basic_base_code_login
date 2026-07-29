@@ -4,13 +4,13 @@ import { ProfileResponseDto } from 'src/users/dtos/response/profile.respose.dto'
 
 export class UserResponseDto {
   @Expose()
-  userName: string;
+  userName!: string;
 
   @Expose()
-  email: string;
+  email!: string;
 
   @Expose()
-  isActive: boolean;
+  isActive?: boolean;
 
   @Expose()
   failedLoginAttempts?: number;
@@ -29,9 +29,9 @@ export class UserResponseDto {
 
   @Expose()
   @Type(() => ProfileResponseDto)
-  profile: ProfileResponseDto;
+  profile!: ProfileResponseDto;
 
   @Expose()
   @Type(() => RoleResponseDto)
-  role: RoleResponseDto;
+  role!: RoleResponseDto;
 }
